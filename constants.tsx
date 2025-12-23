@@ -26,7 +26,7 @@ export const INITIAL_CONFIG: SiteConfig = {
   phone: "0949959668",
   zalo: "0949959668",
   email: "info@binhminh-tayninh.edu.vn",
-  googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d502096.6253862465!2d106.15654625764401!3d10.529789287729349!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31754b05a3723d5f%3A0x5b44e403b9a2c331!2zVHJ1bmcgVMOibSBOZ2_huqFpIE5n4buvIELDrG5oIE1pbmg!5e0!3m2!1svi!2s!4v1766505091639!5m2!1svi!2s",
+  googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d200!2d106.15654625764401!3d10.529789287729349!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31754b05a3723d5f%3A0x5b44e403b9a2c331!2zVHJ1bmcgVMOibSBOZ2_huqFpIE5n4buvIELDrG5oIE1pbmg!5e0!3m2!1svi!2s!4v1766505091639!5m2!1svi!2s",
   seoTitle: "Trung Tâm Ngoại Ngữ Bình Minh - Cần Đước, Tây Ninh",
   seoDescription: "Học tiếng Anh chất lượng cao tại Cần Đước, Tây Ninh. Khóa học IELTS, giao tiếp, tiếng Anh trẻ em.",
   seoKeywords: "tiếng anh tây ninh, ngoại ngữ cần đước, ielts tây ninh, trung tam binh minh",

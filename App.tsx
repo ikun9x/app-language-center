@@ -53,7 +53,27 @@ const App: React.FC = () => {
         if (savedData) {
           const parsed = JSON.parse(savedData);
           const adminCred = localStorage.getItem('bm_admin_cred');
+
+          // Migration: Merge missing config properties from defaults (e.g. googleMapsEmbed)
+          if (parsed.config) {
+            parsed.config = { ...INITIAL_CONFIG, ...parsed.config };
+          } else {
+            parsed.config = INITIAL_CONFIG;
+          }
+
           setState({ ...parsed, isAuthenticated: !!adminCred });
+        } else {
+          // No saved data at all, use seeded defaults
+          const adminCred = localStorage.getItem('bm_admin_cred');
+          setState({
+            categories: INITIAL_CATEGORIES,
+            teachers: INITIAL_TEACHERS,
+            courses: INITIAL_COURSES,
+            config: INITIAL_CONFIG,
+            achievements: INITIAL_ACHIEVEMENTS,
+            messages: [],
+            isAuthenticated: !!adminCred
+          });
         }
       } finally {
         setLoading(false);
