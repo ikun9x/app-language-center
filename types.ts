@@ -15,6 +15,9 @@ export interface Teacher {
   role: string;
   bio: string;
   image: string;
+  phone: string;
+  email: string;
+  gender: 'male' | 'female';
   zalo?: string;
 }
 
@@ -53,6 +56,10 @@ export interface SiteConfig {
   businessLicense: string;
   representative: string;
   foundingDate: string;
+  brandNamePrincipal: string;
+  brandNameSub: string;
+  brandShortName: string;
+  brandLogoImage?: string;
 }
 
 export type AppState = {

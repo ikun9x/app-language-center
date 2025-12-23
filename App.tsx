@@ -10,6 +10,8 @@ import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
@@ -73,6 +75,23 @@ const App: React.FC = () => {
     saveData();
   }, [state, loading]);
 
+  // Update Favicon and Title
+  useEffect(() => {
+    if (state.config.brandNamePrincipal) {
+      document.title = `${state.config.brandNamePrincipal} - ${state.config.brandNameSub || 'Language Center'}`;
+    }
+
+    if (state.config.brandLogoImage) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = state.config.brandLogoImage;
+    }
+  }, [state.config.brandLogoImage, state.config.brandNamePrincipal, state.config.brandNameSub]);
+
   const updateState = (newState: Partial<AppState>) => {
     setState(prev => ({ ...prev, ...newState }));
   };
@@ -106,6 +125,7 @@ const App: React.FC = () => {
           </Routes>
         </div>
       </HashRouter>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" />
     </AppContext.Provider>
   );
 };

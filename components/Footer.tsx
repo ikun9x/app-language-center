@@ -11,11 +11,17 @@ const Footer: React.FC = () => {
       {/* Decorative background element */}
       <div className="absolute top-0 left-1/2 w-[1000px] h-[300px] bg-blue-600/10 -translate-x-1/2 rounded-full blur-[120px]"></div>
 
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
         <div className="space-y-8">
           <div className="flex items-center space-x-3 text-white group cursor-pointer">
-            <div className="bg-blue-600 p-2.5 rounded-xl font-black text-lg transition-transform group-hover:rotate-12">BM</div>
-            <span className="font-black text-2xl tracking-tighter">BÌNH MINH</span>
+            <div className="bg-blue-600 p-2.5 rounded-xl font-black text-lg transition-transform group-hover:rotate-12">
+              {state.config.brandLogoImage ? (
+                <img src={state.config.brandLogoImage} className="w-8 h-8 object-contain" alt="Logo" />
+              ) : (
+                state.config.brandShortName
+              )}
+            </div>
+            <span className="font-black text-2xl tracking-tighter">{state.config.brandNamePrincipal}</span>
           </div>
           <p className="text-base leading-relaxed font-medium text-slate-400">
             Hệ thống đào tạo ngôn ngữ chất lượng cao tại Cần Đước, Tây Ninh. Đồng hành cùng bạn trên con đường chinh phục tiếng Anh.
@@ -23,7 +29,9 @@ const Footer: React.FC = () => {
           <div className="flex space-x-4">
             {/* Social mock buttons */}
             <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg font-black text-sm">f</div>
-            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg font-black text-sm">z</div>
+            <a href={`https://zalo.me/${state.config.zalo}`} target="_blank" className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg">
+              <img src="/images/zalo.png" className="w-6 h-6 object-contain rounded-md" alt="Zalo" />
+            </a>
           </div>
         </div>
 
@@ -61,12 +69,12 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        <div className="md:col-span-1 lg:col-span-1">
           <h4 className="text-white font-black text-lg mb-8 tracking-tight uppercase text-sm">Vị Trí</h4>
-          <div className="rounded-3xl overflow-hidden h-44 bg-slate-800 shadow-2xl border-4 border-slate-800/50">
+          <div className="rounded-[2.5rem] overflow-hidden h-64 bg-slate-800 shadow-2xl border-4 border-slate-800/50">
             <iframe
               src={state.config.googleMapsEmbed}
-              className="w-full h-full border-0 grayscale invert opacity-40 hover:opacity-100 transition duration-1000"
+              className="w-full h-full border-0 transition duration-1000"
               loading="lazy"
             ></iframe>
           </div>
@@ -74,7 +82,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-20 pt-10 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-        <p className="text-center md:text-left">&copy; 2024 TRUNG TÂM NGOẠI NGỮ BÌNH MINH. CHÍNH TRỰC - TẬN TÂM.</p>
+        <p className="text-center md:text-left">&copy; 2025 TRUNG TÂM NGOẠI NGỮ {state.config.brandNamePrincipal}. CHÍNH TRỰC - TẬN TÂM.</p>
         <div className="flex space-x-8 mt-6 md:mt-0">
           <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản</a>
           <a href="#" className="hover:text-blue-500 transition-colors">Bảo mật</a>

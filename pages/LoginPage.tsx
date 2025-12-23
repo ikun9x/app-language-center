@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../constants';
 import { Lock, User, ArrowLeft } from 'lucide-react';
 
+import { toast } from 'react-toastify';
+
 const LoginPage: React.FC = () => {
   const { state, updateState } = useApp();
   const navigate = useNavigate();
@@ -16,7 +18,6 @@ const LoginPage: React.FC = () => {
 
   const [user, setUser] = useState('');
   const [pass, setPass] = useState('');
-  const [error, setError] = useState('');
   const [remember, setRemember] = useState(false);
 
   React.useEffect(() => {
@@ -43,9 +44,10 @@ const LoginPage: React.FC = () => {
         isAuthenticated: true,
         lastLoginDay: today
       });
+      toast.success('Đăng nhập thành công!');
       navigate('/admin');
     } else {
-      setError('Tài khoản hoặc mật khẩu không chính xác');
+      toast.error('Tài khoản hoặc mật khẩu không chính xác');
     }
   };
 
@@ -57,13 +59,18 @@ const LoginPage: React.FC = () => {
           <ArrowLeft size={18} /> <span>Quay lại trang chủ</span>
         </button>
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white font-bold text-3xl shadow-xl shadow-blue-100">BM</div>
-          <h2 className="text-3xl font-extrabold text-slate-900">Admin Login</h2>
+          <div className={state.config.brandLogoImage ? "mx-auto mb-4" : "w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white font-bold text-3xl shadow-xl shadow-blue-100"}>
+            {state.config.brandLogoImage ? (
+              <img src={state.config.brandLogoImage} className="w-24 h-24 object-contain mx-auto" alt="Logo" />
+            ) : (
+              state.config.brandShortName
+            )}
+          </div>
+          <h2 className="text-3xl font-extrabold text-slate-900">{state.config.brandNamePrincipal} Login</h2>
           <p className="text-slate-500 mt-2">Truy cập hệ thống quản trị nội dung</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
-          {error && <div className="p-4 bg-red-50 text-red-600 text-sm font-bold rounded-xl border border-red-100">{error}</div>}
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 ml-1">Username</label>
             <div className="relative">

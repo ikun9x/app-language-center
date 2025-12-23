@@ -26,13 +26,17 @@ export const INITIAL_CONFIG: SiteConfig = {
   phone: "0901 234 567",
   zalo: "0901234567",
   email: "info@binhminh-tayninh.edu.vn",
-  googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125345.5678!2d106.1234!3d11.1234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310b1234567!2zVMOieSBOaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v123456789",
+  googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d200!2d106.1234!3d11.1234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310b1234567!2zVMOieSBOaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v123456789",
   seoTitle: "Trung Tâm Ngoại Ngữ Bình Minh - Cần Đước, Tây Ninh",
   seoDescription: "Học tiếng Anh chất lượng cao tại Cần Đước, Tây Ninh. Khóa học IELTS, giao tiếp, tiếng Anh trẻ em.",
   seoKeywords: "tiếng anh tây ninh, ngoại ngữ cần đước, ielts tây ninh, trung tam binh minh",
   businessLicense: "MSDN: 3901234567 - Cấp bởi Sở Kế hoạch và Đầu tư Tây Ninh",
   representative: "Ông Nguyễn Bình Minh",
-  foundingDate: "15/05/2015"
+  foundingDate: "15/05/2015",
+  brandNamePrincipal: "BÌNH MINH",
+  brandNameSub: "Language Center",
+  brandShortName: "BM",
+  brandLogoImage: ""
 };
 
 export const INITIAL_COURSES: Course[] = [

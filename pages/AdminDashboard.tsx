@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../constants';
+import { toast } from 'react-toastify';
 import {
   LayoutDashboard,
   Settings,
@@ -26,6 +27,20 @@ import {
   Phone,
   Send
 } from 'lucide-react';
+const UPLOAD_BASE_URL = 'http://localhost:5001/uploads/';
+
+const deletePhysicalFile = async (url?: string) => {
+  if (!url || !url.startsWith(UPLOAD_BASE_URL)) return;
+  try {
+    await fetch('http://localhost:5001/api/delete-file', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+  } catch (err) {
+    console.error('Failed to delete physical file:', err);
+  }
+};
 
 const SidebarLink: React.FC<{ to: string, icon: React.ReactNode, label: string, active: boolean }> = ({ to, icon, label, active }) => (
   <Link
@@ -51,8 +66,14 @@ const AdminDashboard: React.FC = () => {
       {/* Sidebar */}
       <aside className="w-72 bg-white border-r border-slate-200 p-6 flex flex-col fixed h-full z-20">
         <div className="flex items-center space-x-3 mb-10 px-2">
-          <div className="bg-blue-600 p-2 rounded-lg font-bold text-white">BM</div>
-          <span className="font-extrabold text-lg text-slate-900 tracking-tight">Admin Console</span>
+          <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-2 rounded-lg font-bold text-white"}>
+            {state.config.brandLogoImage ? (
+              <img src={state.config.brandLogoImage} className="w-10 h-10 object-contain" alt="Logo" />
+            ) : (
+              state.config.brandShortName
+            )}
+          </div>
+          <span className="font-extrabold text-lg text-slate-900 tracking-tight">{state.config.brandNamePrincipal} Admin</span>
         </div>
 
         <nav className="flex-1 space-y-2 overflow-y-auto pr-2">
@@ -135,7 +156,58 @@ const ContentManager: React.FC = () => {
 
   const save = () => {
     updateState({ config: localConfig });
-    alert("Cập nhật thành công!");
+    toast.success("Cập nhật giao diện thành công!");
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      // Delete old local file if exists
+      if (localConfig.brandLogoImage) {
+        await deletePhysicalFile(localConfig.brandLogoImage);
+      }
+
+      const res = await fetch('http://localhost:5001/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setLocalConfig({ ...localConfig, brandLogoImage: data.url });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Tải logo thất bại!");
+    }
+  };
+
+  const handleDeleteLogo = async () => {
+    if (!localConfig.brandLogoImage) return;
+    if (!confirm("Bạn có chắc chắn muốn xoá logo này khỏi máy chủ?")) return;
+
+    try {
+      const res = await fetch('http://localhost:5001/api/delete-file', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: localConfig.brandLogoImage }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLocalConfig({ ...localConfig, brandLogoImage: '' });
+        updateState({ config: { ...state.config, brandLogoImage: '' } });
+        toast.success("Đã xoá logo vật lý!");
+      } else {
+        toast.error("Xoá logo thất bại: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Lỗi khi xoá logo!");
+    }
   };
 
   return (
@@ -148,6 +220,48 @@ const ContentManager: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6">
+          <h3 className="font-bold text-lg border-b pb-4">Branding & Identity</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Tên chính (BÌNH MINH)</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.brandNamePrincipal} onChange={e => setLocalConfig({ ...localConfig, brandNamePrincipal: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Tên phụ (Language Center)</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.brandNameSub} onChange={e => setLocalConfig({ ...localConfig, brandNameSub: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Tên viết tắt / Logo Text (BM)</label>
+              <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.brandShortName} onChange={e => setLocalConfig({ ...localConfig, brandShortName: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Logo Image</label>
+              <div className="flex gap-4 items-center">
+                <div className="relative group text-center">
+                  <div className={localConfig.brandLogoImage ? "w-24 h-24 flex items-center justify-center overflow-hidden" : "w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border"}>
+                    {localConfig.brandLogoImage ? <img src={localConfig.brandLogoImage} className="w-full h-full object-contain" /> : <span className="text-slate-400 font-bold">{localConfig.brandShortName}</span>}
+                  </div>
+                  {localConfig.brandLogoImage && (
+                    <button onClick={handleDeleteLogo} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <input className="w-full p-3 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.brandLogoImage || ''} onChange={e => setLocalConfig({ ...localConfig, brandLogoImage: e.target.value })} placeholder="Dán URL logo hoặc tải lên..." />
+                  <label className="flex items-center gap-2 cursor-pointer bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-100 transition-colors w-fit">
+                    <Upload size={14} /> Tải logo lên
+                    <input type="file" className="hidden" accept="image/*" onChange={handleUpload} />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6">
           <h3 className="font-bold text-lg border-b pb-4">Hero & Media</h3>
           <div className="space-y-4">
@@ -189,6 +303,62 @@ const ContentManager: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6">
+          <h3 className="font-bold text-lg border-b pb-4">Thông tin pháp lý</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Số giấy phép / Mã số thuế</label>
+              <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.businessLicense} onChange={e => setLocalConfig({ ...localConfig, businessLicense: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Người đại diện</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.representative} onChange={e => setLocalConfig({ ...localConfig, representative: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Ngày thành lập</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.foundingDate} onChange={e => setLocalConfig({ ...localConfig, foundingDate: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6 lg:col-span-2">
+          <h3 className="font-bold text-lg border-b pb-4">Vị trí bản đồ (Google Maps Embed)</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">URL nhúng Google Maps (Iframe SRC)</label>
+              <textarea
+                className="w-full p-4 bg-slate-50 rounded-xl outline-none text-xs font-mono"
+                rows={3}
+                value={localConfig.googleMapsEmbed}
+                onChange={e => {
+                  const val = e.target.value;
+                  let finalUrl = val.trim().startsWith('<iframe')
+                    ? (val.match(/src="([^"]+)"/)?.[1] || val)
+                    : val;
+
+                  // Force high zoom (!1d parameter) if found
+                  if (finalUrl.includes('!1d')) {
+                    finalUrl = finalUrl.replace(/!1d[\d\.]+/, '!1d200');
+                  }
+
+                  setLocalConfig({ ...localConfig, googleMapsEmbed: finalUrl });
+                }}
+                placeholder="https://www.google.com/maps/embed?pb=..."
+              />
+              <p className="text-[10px] text-slate-400 mt-2">
+                * Truy cập Google Maps, chọn 'Chia sẻ' &rarr; 'Nhúng bản đồ' và copy phần URL trong thuộc tính <strong>src="..."</strong>
+              </p>
+            </div>
+            {localConfig.googleMapsEmbed && (
+              <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-100 shadow-inner">
+                <iframe src={localConfig.googleMapsEmbed} className="w-full h-full border-0" />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -205,7 +375,7 @@ const LeadsManager: React.FC = () => {
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
-              <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Khách hàng</th>
+              <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[240px]">Khách hàng</th>
               <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Liên hệ</th>
               <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Nội dung</th>
               <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Thời gian</th>
@@ -216,7 +386,15 @@ const LeadsManager: React.FC = () => {
             {state.messages.map(m => (
               <tr key={m.id} className="group hover:bg-slate-50/50 transition duration-300">
                 <td className="px-8 py-6">
-                  <p className="font-bold text-slate-800 text-lg">{m.name}</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-blue-100 flex-shrink-0">
+                      {m.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-lg leading-tight">{m.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Khách hàng tiềm năng</p>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-8 py-6 space-y-1">
                   {m.email && (
@@ -241,12 +419,23 @@ const LeadsManager: React.FC = () => {
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{m.timestamp}</p>
                 </td>
                 <td className="px-8 py-6 text-right">
-                  <button
-                    onClick={() => setReplyLead(m)}
-                    className="bg-blue-50 text-blue-600 px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition transform active:scale-95 shadow-sm"
-                  >
-                    Phản hồi Email
-                  </button>
+                  <div className="flex justify-end gap-2">
+                    <a
+                      href={`https://zalo.me/${m.phone}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-sky-50 text-sky-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-sky-600 hover:text-white transition transform active:scale-95 shadow-sm flex items-center gap-2"
+                    >
+                      <img src="/images/zalo.png" className="w-5 h-5 object-contain rounded" alt="Zalo" />
+                      Zalo
+                    </a>
+                    <button
+                      onClick={() => setReplyLead(m)}
+                      className="bg-blue-50 text-blue-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition transform active:scale-95 shadow-sm"
+                    >
+                      Phản hồi Email
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -362,10 +551,12 @@ const CoursesManager: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (course: any) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa khóa học này?')) {
-      const newCourses = state.courses.filter(c => c.id !== id);
+      await deletePhysicalFile(course.image);
+      const newCourses = state.courses.filter(c => c.id !== course.id);
       updateState({ courses: newCourses });
+      toast.success('Đã xóa khóa học!');
     }
   };
 
@@ -388,6 +579,7 @@ const CoursesManager: React.FC = () => {
     updateState(newState);
     setShowModal(false);
     setEditingCourse(null);
+    toast.success(editingCourse ? 'Cập nhật khóa học thành công!' : 'Đã thêm khóa học mới!');
   };
 
   return (
@@ -419,7 +611,7 @@ const CoursesManager: React.FC = () => {
                   <Edit3 size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete(c.id)}
+                  onClick={() => handleDelete(c)}
                   className="p-3 bg-white/90 backdrop-blur shadow-lg rounded-xl text-slate-600 hover:text-red-600 hover:scale-110 transition"
                   title="Xóa"
                 >
@@ -492,12 +684,28 @@ const CourseModal: React.FC<{ course: any, onClose: () => void, onSave: (data: a
     }
   };
 
-  const handleImageFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({ ...formData, image: reader.result as string });
-    };
-    reader.readAsDataURL(file);
+  const handleImageFile = async (file: File) => {
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      // Delete old local file if exists
+      if (formData.image) {
+        await deletePhysicalFile(formData.image);
+      }
+
+      const res = await fetch('http://localhost:5001/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setFormData({ ...formData, image: data.url });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Tải ảnh thất bại!");
+    }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -739,7 +947,7 @@ const SeoManager: React.FC = () => {
         <button
           onClick={() => {
             updateState({ config: { ...state.config, seoTitle: localSeo.title, seoDescription: localSeo.description, seoKeywords: localSeo.keywords } });
-            alert("SEO updated!");
+            toast.success("Cập nhật SEO thành công!");
           }}
           className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition"
         >
@@ -760,35 +968,324 @@ const SeoManager: React.FC = () => {
 };
 
 const TeachersManager: React.FC = () => {
-  const { state } = useApp();
+  const { state, updateState } = useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
+
+  const handleDelete = async (teacher: any) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa giảng viên này?')) {
+      await deletePhysicalFile(teacher.image);
+      const newTeachers = state.teachers.filter(t => t.id !== teacher.id);
+      updateState({ teachers: newTeachers });
+      toast.success('Đã xóa giảng viên!');
+    }
+  };
+
+  const handleSave = (teacherData: any) => {
+    let newTeachers;
+    if (editingTeacher?.id) {
+      newTeachers = state.teachers.map(t => t.id === editingTeacher.id ? { ...teacherData, id: t.id } : t);
+    } else {
+      const newTeacher = { ...teacherData, id: Date.now().toString() };
+      newTeachers = [...state.teachers, newTeacher];
+    }
+    updateState({ teachers: newTeachers });
+    setShowModal(false);
+    setEditingTeacher(null);
+    toast.success(editingTeacher ? 'Cập nhật thông tin giảng viên thành công!' : 'Đã thêm giảng viên mới!');
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900">Quản lý giảng viên</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900tracking-tight">Quản lý giảng viên</h2>
           <p className="text-slate-500">Danh sách đội ngũ giáo viên của trung tâm.</p>
         </div>
-        <button className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold transition transform active:scale-95 shadow-xl shadow-indigo-100">
-          + Thêm giảng viên
+        <button
+          onClick={() => { setEditingTeacher(null); setShowModal(true); }}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition transform active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-2"
+        >
+          <PlusCircle size={20} /> Thêm giảng viên
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {state.teachers.map((t: any) => (
-          <div key={t.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-            <div className="w-20 h-20 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-              <UsersIcon size={32} />
+          <div key={t.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm group hover:shadow-xl hover:shadow-indigo-100/30 transition-all duration-300 space-y-6">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-3xl bg-indigo-50 overflow-hidden border-4 border-white shadow-inner">
+                {t.image ? (
+                  <img src={t.image} className="w-full h-full object-cover" alt={t.name} />
+                ) : (
+                  <img
+                    src={t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'}
+                    className="w-full h-full object-cover"
+                    alt="Default Avatar"
+                  />
+                )}
+              </div>
+              <div className="absolute -bottom-2 -right-2">
+                <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg text-white ${t.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'}`}>
+                  {t.gender === 'female' ? 'Nữ' : 'Nam'}
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-lg text-slate-900">{t.name}</p>
-              <p className="text-sm text-slate-500">{t.role}</p>
+
+            <div className="space-y-1">
+              <h3 className="font-black text-xl text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{t.name}</h3>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t.role}</p>
             </div>
-            <div className="pt-4 border-t flex gap-2">
-              <button className="text-xs font-bold text-indigo-600 hover:underline">Chỉnh sửa</button>
-              <button className="text-xs font-bold text-red-500 hover:underline">Xóa</button>
+
+            <div className="space-y-3 pt-4 border-t border-slate-50">
+              <div className="flex items-center gap-3 text-sm text-slate-600 font-medium">
+                <Phone size={16} className="text-indigo-400" />
+                <span>{t.phone}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-slate-600 font-medium line-clamp-1">
+                <Mail size={16} className="text-indigo-400" />
+                <span>{t.email}</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex gap-3">
+              <button
+                onClick={() => { setEditingTeacher(t); setShowModal(true); }}
+                className="flex-1 py-3 bg-slate-50 text-indigo-600 rounded-xl text-xs font-black hover:bg-indigo-600 hover:text-white transition transform active:scale-95"
+              >
+                Chỉnh sửa
+              </button>
+              <button
+                onClick={() => handleDelete(t)}
+                className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition transform active:scale-95"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
         ))}
+
+        {state.teachers.length === 0 && (
+          <div className="col-span-full py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-300">
+              <UsersIcon size={40} />
+            </div>
+            <div>
+              <p className="text-slate-400 font-black text-xl">Chưa có giảng viên nào</p>
+              <p className="text-slate-400 text-sm">Hãy bắt đầu bằng cách thêm giảng viên đầu tiên.</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {showModal && (
+        <TeacherModal
+          teacher={editingTeacher}
+          onClose={() => { setShowModal(false); setEditingTeacher(null); }}
+          onSave={handleSave}
+        />
+      )}
+    </div>
+  );
+};
+
+const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data: any) => void }> = ({ teacher, onClose, onSave }) => {
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  const [formData, setFormData] = useState(teacher || {
+    name: '',
+    role: '',
+    phone: '',
+    email: '',
+    gender: 'male',
+    bio: '',
+    image: '',
+    zalo: ''
+  });
+  const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload');
+
+  React.useEffect(() => {
+    modalRef.current?.focus();
+  }, []);
+
+  const handleImageFile = async (file: File) => {
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      // Delete old local file if exists
+      if (formData.image) {
+        await deletePhysicalFile(formData.image);
+      }
+
+      const res = await fetch('http://localhost:5001/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setFormData({ ...formData, image: data.url });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Tải ảnh thất bại!");
+    }
+  };
+
+  const handleSaveClick = () => {
+    if (!formData.name || !formData.role) {
+      toast.warning("Vui lòng nhập đầy đủ Tên và Chức vụ!");
+      return;
+    }
+    // Final check for default avatar if none provided
+    const finalData = { ...formData };
+    if (!finalData.image) {
+      // We don't necessarily need to set it here if the list rendering handles it, 
+      // but let's keep it clear.
+      // finalData.image = finalData.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png';
+    }
+    onSave(finalData);
+  };
+
+  return (
+    <div
+      ref={modalRef}
+      tabIndex={-1}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-6 outline-none"
+    >
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-300 border border-slate-100 flex flex-col max-h-[90vh]">
+        <div className="p-10 border-b flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h3 className="text-3xl font-black text-slate-900 tracking-tight">{teacher ? 'Cập nhật giảng viên' : 'Thêm giảng viên mới'}</h3>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Thông tin chi tiết đội ngũ</p>
+          </div>
+          <button onClick={onClose} className="p-3 hover:bg-slate-200 rounded-full transition"><X size={24} /></button>
+        </div>
+
+        <div className="p-10 space-y-8 overflow-y-auto flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            {/* Left Column: Avatar & Basic Info */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ảnh đại diện</label>
+                <div className="bg-slate-50 rounded-[2.5rem] p-6 space-y-4">
+                  <div
+                    className="relative group w-full aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 hover:border-indigo-400 transition-all flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white shadow-inner"
+                    onClick={() => document.getElementById('teacherImageFile')?.click()}
+                  >
+                    {formData.image ? (
+                      <img src={formData.image} className="absolute inset-0 w-full h-full object-cover" alt="Preview" />
+                    ) : (
+                      <div className="flex flex-col items-center p-4">
+                        <img
+                          src={formData.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'}
+                          className="w-20 h-20 object-contain mb-3 opacity-50 opacity-100 transition-opacity"
+                          alt="Default"
+                        />
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-500">Click để tải ảnh</p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      id="teacherImageFile"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={e => e.target.files?.[0] && handleImageFile(e.target.files[0])}
+                    />
+                    {formData.image && (
+                      <div className="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <span className="bg-white px-4 py-2 rounded-xl text-xs font-black shadow-lg">Thay đổi ảnh</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2 p-1 bg-white rounded-xl shadow-sm">
+                    <button
+                      onClick={() => setFormData({ ...formData, gender: 'male' })}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition ${formData.gender === 'male' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-50'}`}
+                    >
+                      Nam
+                    </button>
+                    <button
+                      onClick={() => setFormData({ ...formData, gender: 'female' })}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition ${formData.gender === 'female' ? 'bg-pink-500 text-white shadow-md' : 'text-slate-400 hover:bg-slate-50'}`}
+                    >
+                      Nữ
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Detailed Forms */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Họ và Tên</label>
+                  <input
+                    className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Ví dụ: Nguyễn Văn A"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chức vụ / Chuyên môn</label>
+                  <input
+                    className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
+                    value={formData.role}
+                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                    placeholder="Ví dụ: Giảng viên IELTS"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số điện thoại</label>
+                  <input
+                    className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="Ví dụ: 090xxx"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email liên hệ</label>
+                  <input
+                    className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Ví dụ: hotro@binhminh.edu.vn"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Giới thiệu ngắn (Bio)</label>
+                <textarea
+                  className="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-[2rem] outline-none transition font-medium text-slate-600 resize-none"
+                  rows={4}
+                  value={formData.bio}
+                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                  placeholder="Nhập đôi nét về kinh nghiệm giảng dạy..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-10 bg-slate-50 border-t flex justify-end gap-5">
+          <button
+            onClick={onClose}
+            className="px-10 py-4 text-slate-400 font-black uppercase tracking-widest hover:text-slate-600 transition"
+          >
+            Hủy bỏ
+          </button>
+          <button
+            onClick={handleSaveClick}
+            className="px-16 py-4 bg-indigo-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition transform active:scale-95 flex items-center gap-3"
+          >
+            <Save size={18} /> {teacher ? 'Cập nhật ngay' : 'Thêm giảng viên'}
+          </button>
+        </div>
       </div>
     </div>
   );

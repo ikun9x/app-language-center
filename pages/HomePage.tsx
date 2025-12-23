@@ -21,18 +21,29 @@ import {
   Circle
 } from 'lucide-react';
 
+import { toast } from 'react-toastify';
+
 const HomePage: React.FC = () => {
   const { state, addMessage } = useApp();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addMessage(formData);
     setSubmitted(true);
+    toast.success('Cảm ơn bạn! Thông tin đã được gửi. Chúng tôi sẽ liên hệ lại sớm.');
     setFormData({ name: '', email: '', phone: '', message: '' });
     setTimeout(() => setSubmitted(false), 5000);
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -40,7 +51,8 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 md:pb-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto w-full relative">
-          <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-20 md:py-28 md:px-20 overflow-hidden relative shadow-2xl shadow-blue-900/40 min-h-[500px] md:min-h-[650px] flex flex-col justify-center">
+          <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-20 overflow-hidden relative shadow-2xl 
+          shadow-blue-900/40 min-h-[500px] flex flex-col justify-center">
             {/* Decorative circles - Moved to background */}
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
             <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-900/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
@@ -103,10 +115,16 @@ const HomePage: React.FC = () => {
                 {state.config.heroSubtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-                <a href="#contact" className="bg-gradient-to-r from-orange-400 to-rose-500 text-white px-8 py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 hover:scale-105 transition transform shadow-2xl shadow-orange-500/30 active:scale-95">
+                <button
+                  onClick={() => scrollToSection('courses')}
+                  className="bg-gradient-to-r from-orange-400 to-rose-500 text-white px-8 py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 hover:scale-105 transition transform shadow-2xl shadow-orange-500/30 active:scale-95"
+                >
                   Bắt đầu ngay <ArrowRight size={20} strokeWidth={3} />
-                </a>
-                <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 hover:bg-white/20 transition transform hover:-translate-y-1">
+                </button>
+                <button
+                  onClick={() => setShowVideoModal(true)}
+                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 hover:bg-white/20 transition transform hover:-translate-y-1"
+                >
                   <Video size={20} /> Khám phá
                 </button>
               </div>
@@ -237,8 +255,12 @@ const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {state.teachers.map(t => (
               <div key={t.id} className="group flex flex-col items-center">
-                <div className="w-56 h-56 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl mb-8 transform group-hover:scale-105 group-hover:rotate-3 transition duration-500">
-                  <img src={t.image} className="w-full h-full object-cover" alt={t.name} />
+                <div className="w-56 h-56 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl mb-8 transform group-hover:scale-105 group-hover:rotate-3 transition duration-500 bg-indigo-50">
+                  <img
+                    src={t.image || (t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png')}
+                    className="w-full h-full object-cover"
+                    alt={t.name}
+                  />
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.name}</h3>
                 <p className="text-blue-600 text-sm font-black mb-4 uppercase tracking-widest">{t.role}</p>
@@ -312,6 +334,7 @@ const HomePage: React.FC = () => {
                     <h4 className="font-black text-xl mb-1 tracking-tight">Chat với tư vấn viên</h4>
                     <p className="text-blue-100 text-sm leading-relaxed mb-4">Hỗ trợ nhanh qua Zalo: {state.config.zalo}</p>
                     <a href={`https://zalo.me/${state.config.zalo}`} target="_blank" className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-sm transition transform hover:-translate-y-1 shadow-xl">
+                      <img src="/images/zalo.png" className="w-5 h-5 object-contain rounded" alt="Zalo" />
                       Nhắn ngay <ArrowRight size={16} />
                     </a>
                   </div>
@@ -329,6 +352,25 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+      {showVideoModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
+          <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-xl" onClick={() => setShowVideoModal(false)} />
+          <div className="bg-black w-full max-w-6xl aspect-video rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-500 border border-white/10">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-6 right-6 z-50 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition backdrop-blur-md border border-white/20"
+            >
+              <X size={24} />
+            </button>
+            <iframe
+              src={state.config.heroVideoUrl.includes('?') ? `${state.config.heroVideoUrl}&autoplay=1` : `${state.config.heroVideoUrl}?autoplay=1`}
+              className="w-full h-full border-0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 };
