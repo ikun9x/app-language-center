@@ -1,0 +1,8 @@
+{
+  "name": "Bình Minh Language Center Portal",
+  "description": "A professional portfolio and management system for Binh Minh Language Center in Can Duoc, Tay Ninh, featuring dynamic content management and SEO optimization.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
