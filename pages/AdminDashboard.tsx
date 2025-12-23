@@ -1017,10 +1017,10 @@ const TeachersManager: React.FC = () => {
             <div className="relative">
               <div className="w-24 h-24 rounded-3xl bg-indigo-50 overflow-hidden border-4 border-white shadow-inner">
                 {t.image ? (
-                  <img src={t.image} className="w-full h-full object-cover" alt={t.name} />
+                  <img src={getAssetPath(t.image)} className="w-full h-full object-cover" alt={t.name} />
                 ) : (
                   <img
-                    src={t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'}
+                    src={getAssetPath(t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png')}
                     className="w-full h-full object-cover"
                     alt="Default Avatar"
                   />
@@ -1175,11 +1175,11 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                     onClick={() => document.getElementById('teacherImageFile')?.click()}
                   >
                     {formData.image ? (
-                      <img src={formData.image} className="absolute inset-0 w-full h-full object-cover" alt="Preview" />
+                      <img src={getAssetPath(formData.image)} className="absolute inset-0 w-full h-full object-cover" alt="Preview" />
                     ) : (
                       <div className="flex flex-col items-center p-4">
                         <img
-                          src={formData.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'}
+                          src={getAssetPath(formData.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png')}
                           className="w-20 h-20 object-contain mb-3 opacity-50 opacity-100 transition-opacity"
                           alt="Default"
                         />
