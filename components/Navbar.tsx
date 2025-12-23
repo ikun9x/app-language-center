@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../constants';
+import { getAssetPath } from '../utils';
 import { Menu, X, LogIn } from 'lucide-react';
 
 const Navbar: React.FC = () => {
@@ -35,7 +36,7 @@ const Navbar: React.FC = () => {
         <Link to="/" className="flex items-center space-x-3 group">
           <div className={state.config.brandLogoImage ? "" : "bg-gradient-to-br from-orange-400 to-rose-500 p-2.5 rounded-xl text-white font-black text-xl shadow-lg shadow-orange-500/30 transition-transform group-hover:scale-110 group-hover:rotate-6"}>
             {state.config.brandLogoImage ? (
-              <img src={state.config.brandLogoImage} className="w-12 h-12 object-contain" alt="Logo" />
+              <img src={getAssetPath(state.config.brandLogoImage)} className="w-12 h-12 object-contain" alt="Logo" />
             ) : (
               state.config.brandShortName
             )}

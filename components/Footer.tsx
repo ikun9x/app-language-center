@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useApp } from '../constants';
+import { getAssetPath } from '../utils';
 import { MapPin, Phone, Mail, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -16,7 +17,7 @@ const Footer: React.FC = () => {
           <div className="flex items-center space-x-3 text-white group cursor-pointer">
             <div className="bg-blue-600 p-2.5 rounded-xl font-black text-lg transition-transform group-hover:rotate-12">
               {state.config.brandLogoImage ? (
-                <img src={state.config.brandLogoImage} className="w-8 h-8 object-contain" alt="Logo" />
+                <img src={getAssetPath(state.config.brandLogoImage)} className="w-8 h-8 object-contain" alt="Logo" />
               ) : (
                 state.config.brandShortName
               )}
@@ -30,7 +31,7 @@ const Footer: React.FC = () => {
             {/* Social mock buttons */}
             <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg font-black text-sm">f</div>
             <a href={`https://zalo.me/${state.config.zalo}`} target="_blank" className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg">
-              <img src="/images/zalo.png" className="w-6 h-6 object-contain rounded-md" alt="Zalo" />
+              <img src={getAssetPath("/images/zalo.png")} className="w-6 h-6 object-contain rounded-md" alt="Zalo" />
             </a>
           </div>
         </div>

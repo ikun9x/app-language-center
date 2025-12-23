@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '../constants';
+import { getAssetPath } from '../utils';
 import {
   ArrowRight,
   Video,
@@ -88,19 +89,19 @@ const HomePage: React.FC = () => {
 
             {/* 3D Floating Icons - ENLARGED and REFINED CLARITY */}
             <div className="absolute top-[80%] md:top-[35%] -translate-y-1/2 -right-8 md:right-1 w-[280px] h-[280px] md:w-[600px] md:h-[600px] animate-float opacity-100 block select-none z-50 pointer-events-none uppercase">
-              <img src="/assets/3d/book.png" className="w-full h-full object-contain" alt="3D Book" />
+              <img src={getAssetPath("/assets/3d/book.png")} className="w-full h-full object-contain" alt="3D Book" />
             </div>
 
             <div className="absolute top-12 right-1/4 w-28 h-28 md:w-44 md:h-44 animate-float-delayed opacity-100 hidden md:block select-none z-50">
-              <img src="/assets/3d/laptop.png" className="w-full h-full object-contain" alt="3D Laptop" />
+              <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
             </div>
 
             <div className="absolute bottom-12 right-[52%] w-39 h-39 md:w-36 md:h-36 animate-float-slow opacity-100 hidden md:block select-none z-50">
-              <img src="/assets/3d/cap.png" className="w-full h-full object-contain" alt="3D Graduation Cap" />
+              <img src={getAssetPath("/assets/3d/cap.png")} className="w-full h-full object-contain" alt="3D Graduation Cap" />
             </div>
 
             <div className="absolute top-12 right-[58%] w-16 h-16 md:w-44 md:h-44 animate-float-delayed opacity-100 hidden md:block select-none z-50">
-              <img src="/assets/3d/crown.png" className="w-full h-full object-contain" alt="crown" />
+              <img src={getAssetPath("/assets/3d/crown.png")} className="w-full h-full object-contain" alt="crown" />
             </div>
 
             <div className="relative z-50 max-w-2xl space-y-6 text-center lg:text-left">
@@ -182,7 +183,7 @@ const HomePage: React.FC = () => {
           <div className="bg-blue-600 p-10 md:p-16 rounded-[3rem] text-white flex flex-col justify-between overflow-hidden relative shadow-2xl shadow-blue-900/30">
             <div className="relative z-10">
               <div className="w-24 h-24 mb-6">
-                <img src="/assets/3d/trophy.png" className="w-full h-full object-contain animate-float-delayed" alt="3D Trophy" />
+                <img src={getAssetPath("/assets/3d/trophy.png")} className="w-full h-full object-contain animate-float-delayed" alt="3D Trophy" />
               </div>
               <h3 className="text-3xl font-black mb-8 leading-tight">Thành Tích <br />Nổi Bật</h3>
               <ul className="space-y-6">
@@ -219,7 +220,7 @@ const HomePage: React.FC = () => {
                 onClick={() => setSelectedCourse(course)}
               >
                 <div className="h-64 relative overflow-hidden">
-                  <img src={course.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt={course.title} />
+                  <img src={getAssetPath(course.image)} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt={course.title} />
                   <div className="absolute top-6 left-6 bg-white px-4 py-1.5 rounded-2xl text-[10px] font-black text-blue-600 uppercase tracking-widest shadow-lg">
                     {course.category}
                   </div>
@@ -257,7 +258,7 @@ const HomePage: React.FC = () => {
               <div key={t.id} className="group flex flex-col items-center">
                 <div className="w-56 h-56 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl mb-8 transform group-hover:scale-105 group-hover:rotate-3 transition duration-500 bg-indigo-50">
                   <img
-                    src={t.image || (t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png')}
+                    src={getAssetPath(t.image || (t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'))}
                     className="w-full h-full object-cover"
                     alt={t.name}
                   />
@@ -277,7 +278,7 @@ const HomePage: React.FC = () => {
           <div className="bg-slate-900 rounded-[3.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative">
             {/* 3D Laptop Icon in Background */}
             <div className="absolute -bottom-10 -right-10 w-80 h-80 opacity-20 hidden lg:block">
-              <img src="/assets/3d/laptop.png" className="w-full h-full object-contain [clip-path:circle(45%)]" alt="3D Laptop" />
+              <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain [clip-path:circle(45%)]" alt="3D Laptop" />
             </div>
 
             <div className="lg:w-3/5 p-10 md:p-16 space-y-10 text-white relative z-10">
@@ -334,7 +335,7 @@ const HomePage: React.FC = () => {
                     <h4 className="font-black text-xl mb-1 tracking-tight">Chat với tư vấn viên</h4>
                     <p className="text-blue-100 text-sm leading-relaxed mb-4">Hỗ trợ nhanh qua Zalo: {state.config.zalo}</p>
                     <a href={`https://zalo.me/${state.config.zalo}`} target="_blank" className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-xl font-black text-sm transition transform hover:-translate-y-1 shadow-xl">
-                      <img src="/images/zalo.png" className="w-5 h-5 object-contain rounded" alt="Zalo" />
+                      <img src={getAssetPath("/images/zalo.png")} className="w-5 h-5 object-contain rounded" alt="Zalo" />
                       Nhắn ngay <ArrowRight size={16} />
                     </a>
                   </div>
@@ -451,13 +452,13 @@ const CourseDetailModal: React.FC<{ course: any, onClose: () => void }> = ({ cou
         <div className="w-full md:w-2/5 bg-slate-800/40 p-8 md:p-12 flex flex-col justify-center border-l border-slate-700/50 relative overflow-hidden">
           {/* 3D Laptop Icon in Background (subtle) */}
           <div className="absolute -bottom-10 -right-10 w-64 h-64 opacity-10 pointer-events-none">
-            <img src="/assets/3d/laptop.png" className="w-full h-full object-contain" alt="3D Laptop" />
+            <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
           </div>
 
           <div className="space-y-8 relative">
             {/* Thumbnail */}
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl group border border-white/10">
-              <img src={course.image} className="w-full h-full object-cover transform group-hover:scale-105 transition duration-700" alt={course.title} />
+              <img src={getAssetPath(course.image)} className="w-full h-full object-cover transform group-hover:scale-105 transition duration-700" alt={course.title} />
               <div className="absolute inset-0 bg-slate-900/20" />
               <div className="absolute top-4 left-4">
                 <span className="bg-blue-600 text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">

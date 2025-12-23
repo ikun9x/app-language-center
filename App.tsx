@@ -30,10 +30,10 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await fetch('/api/data');
+        if (!res.ok) throw new Error('Server not reachable');
         const data = await res.json();
 
         if (data) {
-          const today = new Date().toISOString().split('T')[0];
           // State Migration & Safety Fallbacks
           if (!data.categories) data.categories = INITIAL_CATEGORIES;
           if (!data.teachers) data.teachers = INITIAL_TEACHERS;
@@ -42,14 +42,19 @@ const App: React.FC = () => {
           if (!data.achievements) data.achievements = INITIAL_ACHIEVEMENTS;
           if (!data.messages) data.messages = [];
 
-          // Check session validity (retain in localStorage for session only)
           const adminCred = localStorage.getItem('bm_admin_cred');
-          const isAuth = !!adminCred;
-
-          setState({ ...data, isAuthenticated: isAuth });
+          setState({ ...data, isAuthenticated: !!adminCred });
+          localStorage.setItem('bm_center_data', JSON.stringify(data));
+          return;
         }
       } catch (err) {
-        console.error("Failed to fetch data from server, using initial state:", err);
+        console.warn("API unavailable, falling back to localStorage:", err);
+        const savedData = localStorage.getItem('bm_center_data');
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          const adminCred = localStorage.getItem('bm_admin_cred');
+          setState({ ...parsed, isAuthenticated: !!adminCred });
+        }
       } finally {
         setLoading(false);
       }
@@ -62,6 +67,16 @@ const App: React.FC = () => {
     if (loading) return;
 
     const saveData = async () => {
+      // Always save to localStorage first as fallback
+      localStorage.setItem('bm_center_data', JSON.stringify({
+        config: state.config,
+        courses: state.courses,
+        teachers: state.teachers,
+        achievements: state.achievements,
+        messages: state.messages,
+        categories: state.categories
+      }));
+
       try {
         await fetch('/api/data', {
           method: 'POST',
@@ -69,7 +84,8 @@ const App: React.FC = () => {
           body: JSON.stringify(state)
         });
       } catch (err) {
-        console.error("Failed to save data to server:", err);
+        // Silently fail API save as we already saved to localStorage
+        console.debug("Backend save failed, using local storage only.");
       }
     };
     saveData();

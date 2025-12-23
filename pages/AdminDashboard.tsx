@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../constants';
+import { getAssetPath } from '../utils';
 import { toast } from 'react-toastify';
 import {
   LayoutDashboard,
@@ -68,7 +69,7 @@ const AdminDashboard: React.FC = () => {
         <div className="flex items-center space-x-3 mb-10 px-2">
           <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-2 rounded-lg font-bold text-white"}>
             {state.config.brandLogoImage ? (
-              <img src={state.config.brandLogoImage} className="w-10 h-10 object-contain" alt="Logo" />
+              <img src={getAssetPath(state.config.brandLogoImage)} className="w-10 h-10 object-contain" alt="Logo" />
             ) : (
               state.config.brandShortName
             )}
@@ -242,7 +243,7 @@ const ContentManager: React.FC = () => {
               <div className="flex gap-4 items-center">
                 <div className="relative group text-center">
                   <div className={localConfig.brandLogoImage ? "w-24 h-24 flex items-center justify-center overflow-hidden" : "w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border"}>
-                    {localConfig.brandLogoImage ? <img src={localConfig.brandLogoImage} className="w-full h-full object-contain" /> : <span className="text-slate-400 font-bold">{localConfig.brandShortName}</span>}
+                    {localConfig.brandLogoImage ? <img src={getAssetPath(localConfig.brandLogoImage)} className="w-full h-full object-contain" /> : <span className="text-slate-400 font-bold">{localConfig.brandShortName}</span>}
                   </div>
                   {localConfig.brandLogoImage && (
                     <button onClick={handleDeleteLogo} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
@@ -426,7 +427,7 @@ const LeadsManager: React.FC = () => {
                       rel="noopener noreferrer"
                       className="bg-sky-50 text-sky-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-sky-600 hover:text-white transition transform active:scale-95 shadow-sm flex items-center gap-2"
                     >
-                      <img src="/images/zalo.png" className="w-5 h-5 object-contain rounded" alt="Zalo" />
+                      <img src={getAssetPath("/images/zalo.png")} className="w-5 h-5 object-contain rounded" alt="Zalo" />
                       Zalo
                     </a>
                     <button
