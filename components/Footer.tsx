@@ -79,8 +79,8 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Full-width Map Section */}
-      <div className="mt-10 relative z-10 w-full">
-        <div className="h-96 bg-slate-800 shadow-2xl overflow-hidden border-y border-slate-800/50">
+      <div className="mt-5 relative z-10 w-full">
+        <div className="h-[576px] bg-slate-800 shadow-2xl overflow-hidden border-y border-slate-800/50">
           <iframe
             src={state.config.googleMapsEmbed}
             className="w-full h-full border-0"
@@ -90,7 +90,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-20 pt-10 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+      <div className="max-w-7xl mx-auto px-6 mt-5 pt-5 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
         <p className="text-center md:text-left">&copy; 2025 TRUNG TÂM NGOẠI NGỮ {state.config.brandNamePrincipal}. CHÍNH TRỰC - TẬN TÂM.</p>
         <div className="flex space-x-8 mt-6 md:mt-0">
           <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản</a>
