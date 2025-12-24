@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
     { name: 'Trang Chủ', id: 'hero' },
     { name: 'Khóa Học', id: 'courses' },
     { name: 'Giảng Viên', id: 'teachers' },
+    { name: 'Công khai', id: 'documents' },
     { name: 'Về Chúng Tôi', id: 'about' },
     { name: 'Liên Hệ', id: 'contact' },
   ];

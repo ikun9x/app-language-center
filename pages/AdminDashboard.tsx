@@ -1307,6 +1307,149 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
     </div>
   );
 };
+const DocumentsManager = () => {
+  const { state, updateState } = useApp();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Chỉ hỗ trợ file định dạng PDF');
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/upload-pdf`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const { url } = await response.json();
+        const newDoc: PublicDocument = {
+          id: Date.now().toString(),
+          name: file.name,
+          type: 'PDF',
+          uploadDate: new Date().toLocaleDateString('vi-VN'),
+          url
+        };
+        updateState({ publicDocuments: [...state.publicDocuments, newDoc] });
+        toast.success('Đã tải lên tài liệu thành công');
+      } else {
+        toast.error('Lỗi khi tải lên tệp');
+      }
+    } catch (error) {
+      toast.error('Không thể kết nối đến server');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDelete = async (doc: PublicDocument) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/delete-file`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: doc.url })
+      });
+
+      if (response.ok) {
+        updateState({
+          publicDocuments: state.publicDocuments.filter(d => d.id !== doc.id)
+        });
+        toast.success('Đã xóa tài liệu');
+      } else {
+        toast.error('Lỗi khi xóa tài liệu');
+      }
+    } catch (error) {
+      toast.error('Không thể kết nối đến server');
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-center bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+        <div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Văn bản Công khai</h2>
+          <p className="text-slate-500 font-medium mt-1">Quản lý các tài liệu PDF công khai của trung tâm</p>
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95">
+          {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
+          <span>Tải lên tài liệu mới</span>
+          <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
+        </label>
+      </div>
+
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-slate-50/50 border-b border-slate-100">
+              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Tên tài liệu</th>
+              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Loại</th>
+              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Ngày đăng</th>
+              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {state.publicDocuments.length > 0 ? (
+              state.publicDocuments.map(doc => (
+                <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 transition-transform">
+                        <FileText size={20} />
+                      </div>
+                      <span className="font-bold text-slate-700">{doc.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold uppercase">{doc.type}</span>
+                  </td>
+                  <td className="px-8 py-6 text-slate-500 font-medium">{doc.uploadDate}</td>
+                  <td className="px-8 py-6 text-right">
+                    <div className="flex justify-end space-x-2">
+                      <a
+                        href={getAssetPath(doc.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-3 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all"
+                      >
+                        <ExternalLink size={18} />
+                      </a>
+                      <button
+                        onClick={() => handleDelete(doc)}
+                        className="p-3 text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-8 py-20 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-4 opacity-30">
+                    <FileText size={48} />
+                    <p className="font-black text-xl">Chưa có tài liệu nào</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 const ComplianceManager: React.FC = () => {
   return (

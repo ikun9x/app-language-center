@@ -21,7 +21,8 @@ const App: React.FC = () => {
     achievements: INITIAL_ACHIEVEMENTS,
     messages: [],
     isAuthenticated: false,
-    categories: INITIAL_CATEGORIES
+    categories: INITIAL_CATEGORIES,
+    publicDocuments: INITIAL_DOCUMENTS
   });
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +42,7 @@ const App: React.FC = () => {
           if (!data.config) data.config = INITIAL_CONFIG;
           if (!data.achievements) data.achievements = INITIAL_ACHIEVEMENTS;
           if (!data.messages) data.messages = [];
+          if (!data.publicDocuments) data.publicDocuments = INITIAL_DOCUMENTS; // Add publicDocuments fallback
 
           const adminCred = localStorage.getItem('bm_admin_cred');
           setState({ ...data, isAuthenticated: !!adminCred });
@@ -59,6 +61,10 @@ const App: React.FC = () => {
             parsed.config = { ...INITIAL_CONFIG, ...parsed.config };
           } else {
             parsed.config = INITIAL_CONFIG;
+          }
+          // Migration: Ensure publicDocuments exists
+          if (!parsed.publicDocuments) {
+            parsed.publicDocuments = INITIAL_DOCUMENTS;
           }
 
           setState({ ...parsed, isAuthenticated: !!adminCred });

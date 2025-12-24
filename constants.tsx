@@ -133,3 +133,5 @@ export const INITIAL_CATEGORIES = [
   "Tiếng Anh Doanh Nghiệp",
   "Young Learners"
 ];
+
+export const INITIAL_DOCUMENTS: PublicDocument[] = [];

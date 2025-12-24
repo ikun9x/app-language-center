@@ -12,15 +12,16 @@ const app = express();
 const PORT = 5001;
 const DB_FILE = path.join(__dirname, 'db.json');
 const UPLOAD_DIR = path.join(__dirname, 'public', 'uploads');
+const PDF_DIR = path.join(__dirname, 'public', 'pdfs');
 
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
+// Ensure directories exist
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+if (!fs.existsSync(PDF_DIR)) fs.mkdirSync(PDF_DIR, { recursive: true });
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(UPLOAD_DIR));
+app.use('/pdfs', express.static(PDF_DIR));
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -34,6 +35,27 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+const pdfStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, PDF_DIR);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const uploadPdf = multer({
+    storage: pdfStorage,
+    fileFilter: (req, file, cb) => {
+        if (path.extname(file.originalname).toLowerCase() === '.pdf') {
+            cb(null, true);
+        } else {
+            cb(new Error('Only PDF files are allowed!'), false);
+        }
+    }
+});
 
 // Helper to read DB
 const readDB = () => {
@@ -81,13 +103,25 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     res.json({ url });
 });
 
+app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const url = `http://localhost:5001/pdfs/${req.file.filename}`;
+    res.json({ url });
+});
+
 app.delete('/api/delete-file', (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
 
     try {
         const filename = path.basename(url);
-        const filePath = path.join(UPLOAD_DIR, filename);
+        let filePath = path.join(UPLOAD_DIR, filename);
+
+        if (!fs.existsSync(filePath)) {
+            filePath = path.join(PDF_DIR, filename);
+        }
 
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);

@@ -38,6 +38,14 @@ export interface GuestMessage {
   replied: boolean;
 }
 
+export interface PublicDocument {
+  id: string;
+  name: string;
+  type: string;
+  uploadDate: string;
+  url: string;
+}
+
 export interface SiteConfig {
   heroVideoUrl: string;
   heroTitle: string;
@@ -72,4 +80,5 @@ export type AppState = {
   isAuthenticated: boolean;
   lastLoginDay?: string;
   categories: string[];
+  publicDocuments: PublicDocument[];
 };
