@@ -110,9 +110,8 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     const stream = cloudinary.uploader.upload_stream(
         {
             folder: 'binhminh_pdfs',
-            resource_type: 'auto',
-            access_mode: 'public',
-            flags: 'attachment:false'
+            resource_type: 'raw',
+            access_mode: 'public'
         },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
@@ -128,35 +127,32 @@ app.delete('/api/delete-file', async (req, res) => {
 
     try {
         if (url.includes('cloudinary.com')) {
-            // Robust extraction of public_id
-            // Cloudinary URL: .../upload/[version]/[folder]/[id].[ext]
+            // Robust extraction of public_id and folder
+            // URL format: .../upload/v12345/folder/id.ext or .../upload/folder/id.ext
             const urlParts = url.split('/');
             const filenameWithExt = urlParts.pop();
             const publicId = filenameWithExt.split('.')[0];
 
-            // Find the folder part (usually after 'upload/')
             const uploadIndex = urlParts.indexOf('upload');
-            let folder = '';
-            if (uploadIndex !== -1 && urlParts.length > uploadIndex + 2) {
-                // If there's a version (starts with 'v'), skip it
-                const afterUpload = urlParts[uploadIndex + 1];
-                if (afterUpload.startsWith('v')) {
-                    folder = urlParts.slice(uploadIndex + 2).join('/');
-                } else {
-                    folder = urlParts.slice(uploadIndex + 1).join('/');
+            let folderParts = [];
+            if (uploadIndex !== -1) {
+                // Skip 'upload' and potentially 'v12345'
+                let startIndex = uploadIndex + 1;
+                if (urlParts[startIndex] && urlParts[startIndex].startsWith('v')) {
+                    startIndex++;
                 }
+                folderParts = urlParts.slice(startIndex);
             }
 
-            const fullPublicId = folder ? `${folder}/${publicId}` : publicId;
-            console.log('Deleting Cloudinary resource:', fullPublicId);
+            const fullPublicId = folderParts.length > 0 ? `${folderParts.join('/')}/${publicId}` : publicId;
+            console.log('Attempting to delete Cloudinary resource:', fullPublicId);
 
             // Try all possible resource types to be safe
-            const types = ['image', 'raw', 'video'];
-            for (const rType of types) {
+            for (const rType of ['image', 'raw', 'video']) {
                 try {
                     await cloudinary.uploader.destroy(fullPublicId, { resource_type: rType });
                 } catch (e) {
-                    console.warn(`Failed to delete as ${rType}:`, e.message);
+                    console.warn(`Skip ${rType} delete for ${fullPublicId}:`, e.message);
                 }
             }
             return res.json({ success: true });
@@ -164,22 +160,22 @@ app.delete('/api/delete-file', async (req, res) => {
 
         // Fallback for local files
         try {
-            const urlObj = new URL(url.startsWith('http') ? url : `http://localhost${url}`);
-            const filename = path.basename(urlObj.pathname);
-            const isPdf = urlObj.pathname.includes('/pdfs/');
+            const urlPath = url.startsWith('http') ? new URL(url).pathname : url;
+            const filename = path.basename(urlPath);
+            const isPdf = urlPath.includes('/pdfs/');
             const filePath = path.join(__dirname, 'public', isPdf ? 'pdfs' : 'uploads', filename);
 
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
         } catch (err) {
-            console.error('Local file delete error:', err);
+            console.error('Local file delete skip:', err.message);
         }
 
         res.json({ success: true });
     } catch (err) {
-        console.error('Delete-file endpoint error:', err);
-        res.status(500).json({ error: err.message });
+        console.error('API delete-file error:', err);
+        res.json({ success: true, warning: err.message }); // Always return success to UI to avoid blocking
     }
 });
 
