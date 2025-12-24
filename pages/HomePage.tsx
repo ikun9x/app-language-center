@@ -78,7 +78,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <main className="overflow-x-hidden pt-20">
+    <main className="overflow-x-hidden">
       {/* Blog Detail Modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -106,7 +106,7 @@ const HomePage: React.FC = () => {
         </div>
       )}
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pb-32 px-4 md:px-6">
+      <section className="relative pt-24 pb-16 md:pb-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto w-full relative">
           <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-20 overflow-hidden relative shadow-2xl 
           shadow-blue-900/40 min-h-[500px] flex flex-col justify-center">
@@ -373,9 +373,6 @@ const HomePage: React.FC = () => {
               <span className="bg-blue-600/10 text-blue-600 px-6 py-2 rounded-full text-xs font-black tracking-widest uppercase inline-block">Tin mới nhất</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Tin tức & Thư viện</h2>
             </div>
-            <button className="flex items-center gap-2 text-blue-600 font-black text-sm uppercase tracking-widest hover:gap-4 transition-all">
-              Xem tất cả <ArrowRight size={18} />
-            </button>
           </div>
 
           <div className="relative group">

@@ -2268,6 +2268,29 @@ const ComplianceManager: React.FC = () => {
   );
 };
 
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    [{ 'align': [] }],
+    ['blockquote', 'code-block'],
+    ['link', 'image'],
+    ['clean']
+  ],
+};
+
+const quillFormats = [
+  'header', 'size',
+  'bold', 'italic', 'underline', 'strike',
+  'color', 'background',
+  'list', 'bullet', 'align',
+  'blockquote', 'code-block',
+  'link', 'image'
+];
+
 const BlogPostsManager: React.FC = () => {
   const { state, updateState } = useApp();
   const [showModal, setShowModal] = useState(false);
@@ -2395,8 +2418,15 @@ const BlogPostsManager: React.FC = () => {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nội dung chi tiết (Rich Text)</label>
-                <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 min-h-[300px]">
-                  <ReactQuill theme="snow" value={localPost.content} onChange={val => setLocalPost({ ...localPost, content: val })} className="bg-white h-[250px]" />
+                <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 min-h-[400px]">
+                  <ReactQuill
+                    theme="snow"
+                    value={localPost.content}
+                    onChange={val => setLocalPost({ ...localPost, content: val })}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    className="bg-white h-[350px]"
+                  />
                 </div>
               </div>
 
