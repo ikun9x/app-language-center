@@ -122,39 +122,58 @@ const writeDB = (data) => {
 
 // Endpoints
 app.get('/api/data', async (req, res) => {
+    // 1. Try MongoDB if connected
     if (mongoose.connection.readyState === 1) {
         try {
             const data = await DataModel.findOne({ id: 'app_state' });
-            return res.json(data);
+            if (data) {
+                return res.json({ ...data.toObject(), _storage: 'mongodb' });
+            }
+            console.log(">>> MongoDB is empty, falling back to db.json for initial seed.");
         } catch (err) {
             console.error('Error reading MongoDB:', err);
         }
     }
-    // Fallback
+
+    // 2. Fallback to local db.json
     const data = readDB();
-    res.json(data);
+    res.json({ ...data, _storage: 'file' });
 });
 
 app.post('/api/data', async (req, res) => {
-    if (mongoose.connection.readyState === 1) {
-        try {
-            await DataModel.findOneAndUpdate(
-                { id: 'app_state' },
-                { $set: req.body },
-                { upsert: true, new: true }
-            );
-            return res.json({ success: true, storage: 'mongodb' });
-        } catch (err) {
-            console.error('Error writing MongoDB:', err);
+    // 1. Mandatory MongoDB if URI is present
+    if (process.env.MONGODB_URI) {
+        if (mongoose.connection.readyState === 1) {
+            try {
+                await DataModel.findOneAndUpdate(
+                    { id: 'app_state' },
+                    { $set: req.body },
+                    { upsert: true, new: true }
+                );
+                console.log(">>> [STORAGE] Data saved to MongoDB Atlas");
+                return res.json({ success: true, storage: 'mongodb' });
+            } catch (err) {
+                console.error('>>> [STORAGE] FAILED to save to MongoDB:', err);
+                return res.status(503).json({
+                    error: 'Cloud storage connection error. Data NOT saved.',
+                    details: err.message
+                });
+            }
+        } else {
+            console.error(">>> [STORAGE] MongoDB not ready (readyState: " + mongoose.connection.readyState + ")");
+            return res.status(503).json({
+                error: 'Database connection is warming up. Please try again in 5 seconds.'
+            });
         }
     }
 
-    // Fallback to local
+    // 2. Local development fallback (non-production)
+    console.log(">>> [STORAGE] Falling back to local db.json (No MONGODB_URI detected)");
     const success = writeDB(req.body);
     if (success) {
-        res.json({ success: true, storage: 'local' });
+        res.json({ success: true, storage: 'file' });
     } else {
-        res.status(500).json({ error: 'Failed to write data' });
+        res.status(500).json({ error: 'Failed to write to local storage' });
     }
 });
 
