@@ -301,17 +301,27 @@ const HomePage: React.FC = () => {
                     state.publicDocuments.map(doc => (
                       <tr key={doc.id} className="group hover:bg-blue-50/30 transition-all duration-300">
                         <td className="px-10 py-8">
-                          <div className="flex items-center gap-6">
-                            <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0">
+                          <div className="flex items-start gap-6">
+                            <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
                               <FileText size={28} />
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-extrabold text-slate-900 text-xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+                              <span className="font-black text-slate-900 text-2xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
                                 {doc.label || doc.name}
                               </span>
-                              <span className="text-sm font-medium text-slate-400 mt-1 flex items-center gap-2">
-                                <Globe size={14} /> Hệ thống lưu trữ công khai
-                              </span>
+                              {doc.description && (
+                                <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed max-w-xl">
+                                  {doc.description}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-3 mt-3">
+                                <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded italic">
+                                  Mã tệp: {doc.name}
+                                </span>
+                                <span className="text-[10px] font-bold text-blue-500 flex items-center gap-1">
+                                  <Globe size={10} /> Công khai
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </td>

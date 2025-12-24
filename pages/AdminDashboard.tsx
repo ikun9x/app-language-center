@@ -1327,6 +1327,7 @@ const DocumentsManager = () => {
   const { state, updateState } = useApp();
   const [isUploading, setIsUploading] = useState(false);
   const [newDocLabel, setNewDocLabel] = useState('');
+  const [newDocDescription, setNewDocDescription] = useState('');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1346,19 +1347,20 @@ const DocumentsManager = () => {
         method: 'POST',
         body: formData,
       });
-
       if (response.ok) {
         const { url } = await response.json();
         const newDoc: PublicDocument = {
           id: Date.now().toString(),
           name: file.name,
           label: newDocLabel.trim() || file.name,
+          description: newDocDescription.trim(),
           type: 'PDF',
           uploadDate: new Date().toLocaleDateString('vi-VN'),
           url
         };
         updateState({ publicDocuments: [...state.publicDocuments, newDoc] });
         setNewDocLabel('');
+        setNewDocDescription('');
         toast.success('Đã tải lên tài liệu thành công');
       } else {
         toast.error('Lỗi khi tải lên tệp');
@@ -1401,19 +1403,28 @@ const DocumentsManager = () => {
           <p className="text-slate-500 font-medium mt-1">Quản lý các tài liệu PDF công khai của trung tâm</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+        <div className="flex flex-col gap-4 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input
+              type="text"
+              placeholder="Nhãn văn bản (VD: Quyết định thành lập...)"
+              className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-slate-700 min-w-[300px]"
+              value={newDocLabel}
+              onChange={(e) => setNewDocLabel(e.target.value)}
+            />
+            <label className="flex items-center justify-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 whitespace-nowrap">
+              {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
+              <span>Tải lên PDF</span>
+              <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
+            </label>
+          </div>
           <input
             type="text"
-            placeholder="Nhãn văn bản (VD: Quyết định thành lập...)"
-            className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-slate-700 min-w-[300px]"
-            value={newDocLabel}
-            onChange={(e) => setNewDocLabel(e.target.value)}
+            placeholder="Mô tả nội dung văn bản (không bắt buộc)..."
+            className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-medium text-slate-600 w-full"
+            value={newDocDescription}
+            onChange={(e) => setNewDocDescription(e.target.value)}
           />
-          <label className="flex items-center justify-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 whitespace-nowrap">
-            {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
-            <span>Tải lên PDF</span>
-            <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
-          </label>
         </div>
       </div>
 
@@ -1432,13 +1443,20 @@ const DocumentsManager = () => {
               state.publicDocuments.map(doc => (
                 <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="px-8 py-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
-                        <FileText size={20} />
+                    <div className="flex items-start space-x-4">
+                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
+                        <FileText size={24} />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-extrabold text-slate-900 text-lg leading-tight mb-1">{doc.label || doc.name}</span>
-                        <span className="text-xs font-medium text-slate-400 font-mono truncate max-w-[200px]">{doc.name}</span>
+                        <span className="font-black text-slate-900 text-xl leading-tight mb-1">{doc.label || doc.name}</span>
+                        {doc.description && (
+                          <p className="text-sm text-slate-500 font-medium mb-2 leading-relaxed max-w-md">
+                            {doc.description}
+                          </p>
+                        )}
+                        <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded w-fit italic">
+                          Tệp gốc: {doc.name}
+                        </span>
                       </div>
                     </div>
                   </td>

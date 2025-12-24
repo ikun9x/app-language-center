@@ -124,15 +124,23 @@ app.delete('/api/delete-file', async (req, res) => {
     try {
         if (url.includes('cloudinary.com')) {
             // Extract public_id for Cloudinary deletion
-            // Example: https://res.cloudinary.com/demo/image/upload/v1570975139/sample.jpg
+            // Example: https://res.cloudinary.com/djzcocm5c/image/upload/v1735031127/binhminh_uploads/z6160566373322_5174092d061c28c86d888f4e91022830_itaxsw.jpg
             const parts = url.split('/');
-            const filename = parts[parts.length - 1];
-            const publicId = filename.split('.')[0];
+            const filenameWithExt = parts[parts.length - 1];
+            const publicId = filenameWithExt.split('.')[0];
             const folder = url.includes('binhminh_pdfs') ? 'binhminh_pdfs' : 'binhminh_uploads';
+            const fullPublicId = `${folder}/${publicId}`;
 
-            await cloudinary.uploader.destroy(`${folder}/${publicId}`, {
-                resource_type: url.includes('binhminh_pdfs') ? 'raw' : 'image'
-            });
+            // Try to delete as raw first (for PDFs)
+            try {
+                await cloudinary.uploader.destroy(fullPublicId, { resource_type: 'raw' });
+            } catch (e) { }
+
+            // Try to delete as image (for images)
+            try {
+                await cloudinary.uploader.destroy(fullPublicId, { resource_type: 'image' });
+            } catch (e) { }
+
             return res.json({ success: true });
         }
 

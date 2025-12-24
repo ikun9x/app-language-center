@@ -42,6 +42,7 @@ export interface PublicDocument {
   id: string;
   name: string;
   label?: string;
+  description?: string;
   type: string;
   uploadDate: string;
   url: string;
