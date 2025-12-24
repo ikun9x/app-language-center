@@ -19,6 +19,8 @@ export interface Teacher {
   email: string;
   gender: 'male' | 'female';
   zalo?: string;
+  showPhone?: boolean;
+  showEmail?: boolean;
 }
 
 export interface Achievement {

@@ -20,13 +20,14 @@ import {
   Sparkles,
   Zap,
   Circle,
-  FileText,
   Globe,
   ExternalLink,
   Search,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Mail,
+  Phone as PhoneIcon
 } from 'lucide-react';
 
 import { toast } from 'react-toastify';
@@ -275,6 +276,24 @@ const HomePage: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.name}</h3>
                 <p className="text-blue-600 text-sm font-black mb-4 uppercase tracking-widest">{t.role}</p>
+                <div className="flex flex-col items-center gap-1 mb-4">
+                  {t.showPhone && t.phone && (
+                    <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">
+                      <div className="w-5 h-5 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
+                        <PhoneIcon size={10} />
+                      </div>
+                      {t.phone}
+                    </div>
+                  )}
+                  {t.showEmail && t.email && (
+                    <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">
+                      <div className="w-5 h-5 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
+                        <Mail size={10} />
+                      </div>
+                      {t.email}
+                    </div>
+                  )}
+                </div>
                 <p className="text-slate-500 text-sm italic font-medium max-w-[200px] leading-relaxed line-clamp-2">{t.bio}</p>
               </div>
             ))}

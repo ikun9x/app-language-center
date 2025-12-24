@@ -1250,7 +1250,9 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
     gender: 'male',
     bio: '',
     image: '',
-    zalo: ''
+    zalo: '',
+    showPhone: false,
+    showEmail: false
   });
   const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload');
 
@@ -1390,7 +1392,18 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số điện thoại</label>
+                  <div className="flex justify-between items-center ml-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Số điện thoại</label>
+                    <label className="flex items-center gap-1.5 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        className="w-3 h-3 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        checked={formData.showPhone}
+                        onChange={e => setFormData({ ...formData, showPhone: e.target.checked })}
+                      />
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">Công khai</span>
+                    </label>
+                  </div>
                   <input
                     className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
                     value={formData.phone}
@@ -1399,7 +1412,18 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email liên hệ</label>
+                  <div className="flex justify-between items-center ml-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email liên hệ</label>
+                    <label className="flex items-center gap-1.5 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        className="w-3 h-3 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        checked={formData.showEmail}
+                        onChange={e => setFormData({ ...formData, showEmail: e.target.checked })}
+                      />
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">Công khai</span>
+                    </label>
+                  </div>
                   <input
                     className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
                     value={formData.email}
