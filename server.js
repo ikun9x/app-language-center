@@ -24,7 +24,8 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
-let lastMongoError = null;
+let lastMongoError = "Connecting/Initial attempt...";
+let mongoConnectionTime = null;
 
 console.log(">>> [INIT] Checking MONGODB_URI...");
 if (MONGODB_URI) {
@@ -36,14 +37,15 @@ if (MONGODB_URI) {
         .then(() => {
             console.log(">>> [INIT] SUCCESS: Connected to MongoDB Atlas");
             lastMongoError = null;
+            mongoConnectionTime = new Date().toISOString();
             migrateDataIfNeeded();
         })
         .catch(err => {
-            lastMongoError = err.message;
+            lastMongoError = `FAILED at ${new Date().toLocaleTimeString()}: ${err.message}`;
             console.error(">>> [INIT] ERROR: MongoDB Connection Failed:", err.message);
         });
 } else {
-    lastMongoError = "Missing MONGODB_URI environment variable";
+    lastMongoError = "Missing MONGODB_URI environment variable on Render";
     console.error(">>> [INIT] CRITICAL WARNING: MONGODB_URI is MISSING!");
 }
 
@@ -159,6 +161,7 @@ app.get('/api/status', (req, res) => {
         mongodb_connection_state: mongoose.connection.readyState,
         mongodb_state_desc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
         mongodb_last_error: lastMongoError,
+        mongodb_connection_time: mongoConnectionTime,
         cloudinary_configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
         server_uptime: process.uptime(),
         env: process.env.NODE_ENV || 'production'
