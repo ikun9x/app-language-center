@@ -108,18 +108,38 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    console.log('Final attempt: Basic PDF upload...');
+    const originalName = req.file.originalname;
+    const nameWithoutExt = path.parse(originalName).name;
+
+    // Sanitize filename for a clean URL
+    const sanitizedName = nameWithoutExt
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+        .slice(0, 50);
+
+    const publicId = `${sanitizedName}_${Date.now()}`;
+
     const stream = cloudinary.uploader.upload_stream(
         {
-            resource_type: 'auto'
+            folder: 'binhminh_pdfs',
+            resource_type: 'image', // Best for browser viewing
+            public_id: publicId,
+            format: 'pdf'
         },
         (error, result) => {
             if (error) {
-                console.error('Upload Error:', error);
+                console.error('Cloudinary PDF Upload Error:', error);
                 return res.status(500).json({ error: error.message });
             }
-            console.log('Upload Result:', result.secure_url);
-            res.json({ url: result.secure_url });
+
+            // Ensure URL ends in .pdf for browser compatibility
+            let finalUrl = result.secure_url;
+            if (!finalUrl.toLowerCase().endsWith('.pdf')) {
+                finalUrl += '.pdf';
+            }
+            res.json({ url: finalUrl });
         }
     );
     stream.end(req.file.buffer);
