@@ -12,14 +12,14 @@ const Footer: React.FC = () => {
       {/* Decorative background element */}
       <div className="absolute top-0 left-1/2 w-[1000px] h-[300px] bg-blue-600/10 -translate-x-1/2 rounded-full blur-[120px]"></div>
 
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10">
         <div className="space-y-8">
           <div className="flex items-center space-x-6 text-white group cursor-pointer">
-            <div className="w-20 h-20 rounded-full border-2 border-white/20 p-1 flex items-center justify-center bg-white shadow-xl overflow-hidden transition-transform group-hover:scale-105">
+            <div className="w-24 h-24 flex items-center justify-center transition-transform group-hover:scale-105">
               {state.config.brandLogoImage ? (
                 <img src={getAssetPath(state.config.brandLogoImage)} className="w-full h-full object-contain" alt="Logo" />
               ) : (
-                <span className="text-blue-600 font-black">{state.config.brandShortName}</span>
+                <span className="text-blue-600 font-black text-2xl">{state.config.brandShortName}</span>
               )}
             </div>
             <div className="flex flex-col">
@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
               <span className="font-bold text-xs tracking-[0.2em] text-blue-400 uppercase">{state.config.brandNameSub}</span>
             </div>
           </div>
-          <p className="text-base leading-relaxed font-medium text-slate-400">
+          <p className="text-base leading-relaxed font-medium text-slate-400 max-w-md">
             Hệ thống đào tạo ngôn ngữ chất lượng cao tại Cần Đước, Tây Ninh. Đồng hành cùng bạn trên con đường chinh phục tiếng Anh.
           </p>
           <div className="flex space-x-4">
@@ -76,16 +76,17 @@ const Footer: React.FC = () => {
             <p className="text-slate-500 italic pl-7 opacity-60 leading-relaxed">Phục vụ công tác thanh tra, kiểm tra theo quy định.</p>
           </div>
         </div>
+      </div>
 
-        <div className="md:col-span-1 lg:col-span-1">
-          <h4 className="text-white font-black text-lg mb-8 tracking-tight uppercase text-sm">Vị Trí</h4>
-          <div className="rounded-[2.5rem] overflow-hidden h-64 bg-slate-800 shadow-2xl border-4 border-slate-800/50">
-            <iframe
-              src={state.config.googleMapsEmbed}
-              className="w-full h-full border-0 transition duration-1000"
-              loading="lazy"
-            ></iframe>
-          </div>
+      {/* Full-width Map Section */}
+      <div className="max-w-7xl mx-auto px-6 mt-16 relative z-10">
+        <div className="rounded-[2.5rem] overflow-hidden h-80 bg-slate-800 shadow-2xl border-4 border-slate-800/50">
+          <iframe
+            src={state.config.googleMapsEmbed}
+            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+            loading="lazy"
+            title="Google Maps"
+          ></iframe>
         </div>
       </div>
 
