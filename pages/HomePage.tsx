@@ -191,7 +191,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats / Highlights - Compact */}
-      <section className="relative z-40 -mt-16 md:-mt-24 px-6">
+      <section className="relative z-40 -mt-8 md:-mt-12 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'NĂM KINH NGHIỆM', value: state.config.statsYears || '10+', color: 'bg-rose-50', iconColor: 'bg-rose-500', icon: <BookOpen className="text-white" size={20} />, textColor: 'text-rose-600' },

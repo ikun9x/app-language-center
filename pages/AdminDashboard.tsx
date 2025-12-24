@@ -180,40 +180,125 @@ const AdminDashboard: React.FC = () => {
 // --- Sub-pages ---
 
 const Overview: React.FC<{ state: any }> = ({ state }) => (
-  <div className="space-y-10">
-    <div>
-      <h2 className="text-3xl font-extrabold text-slate-900">Tổng quan hệ thống</h2>
-      <p className="text-slate-500">Chào mừng trở lại, Admin.</p>
+  <div className="space-y-8">
+    <div className="flex justify-between items-end">
+      <div>
+        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Tổng quan hệ thống</h2>
+        <p className="text-slate-500 font-medium tracking-tight">Chào mừng trở lại, Admin. Đây là tình hình hoạt động của trung tâm.</p>
+      </div>
+      <div className="hidden md:block">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </div>
     </div>
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-      <StatCard label="Khóa học" value={state.courses.length} color="blue" />
-      <StatCard label="Giảng viên" value={state.teachers.length} color="indigo" />
-      <StatCard label="Yêu cầu tư vấn" value={state.messages.length} color="orange" />
-      <StatCard label="Khách hôm nay" value="128" color="green" />
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <StatCard label="Khóa học đang mở" value={state.courses.length} color="blue" icon={<BookOpen size={24} />} trend="+2 tháng này" />
+      <StatCard label="Đội ngũ giảng viên" value={state.teachers.length} color="indigo" icon={<UsersIcon size={24} />} trend="Ổn định" />
+      <StatCard label="Yêu cầu tư vấn mới" value={state.messages.length} color="orange" icon={<MessageSquare size={24} />} trend="Cần xử lý" />
+      <StatCard label="Lượt truy cập" value="1,280" color="emerald" icon={<Globe size={24} />} trend="+15% tuần qua" />
     </div>
-    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-      <h3 className="font-bold text-lg mb-4">Hoạt động gần đây</h3>
-      <div className="space-y-4">
-        {state.messages.slice(0, 3).map((m: any) => (
-          <div key={m.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
-            <div>
-              <p className="font-bold text-slate-800">{m.name}</p>
-              <p className="text-xs text-slate-500">Gửi yêu cầu lúc {m.timestamp}</p>
+
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Recent Activity */}
+      <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+        <div className="flex justify-between items-center">
+          <h3 className="font-black text-xl text-slate-900">Yêu cầu tư vấn gần đây</h3>
+          <Link to="/admin/leads" className="text-blue-600 text-sm font-bold hover:underline">Xem tất cả</Link>
+        </div>
+        <div className="space-y-4">
+          {state.messages.length > 0 ? (
+            state.messages.slice(0, 5).map((m: any) => (
+              <div key={m.id} className="group flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 rounded-2xl transition-all border border-transparent hover:border-blue-100">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm transition-transform group-hover:scale-110">
+                  <MessageSquare size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-slate-800">{m.name}</p>
+                  <p className="text-xs text-slate-500 font-medium">{m.phone} • {m.timestamp}</p>
+                </div>
+                <div className="hidden sm:block">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">Mới</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-slate-400 font-medium">Chưa có yêu cầu mới nào.</p>
             </div>
-            <span className="text-blue-600 font-bold text-xs uppercase tracking-widest">Mới</span>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions / System Status */}
+      <div className="space-y-8">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+          <div className="relative z-10 space-y-4">
+            <h3 className="font-black text-xl">Lối tắt quản trị</h3>
+            <div className="grid grid-cols-1 gap-3">
+              <Link to="/admin/content" className="flex items-center gap-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all font-bold text-sm">
+                <Edit3 size={18} /> Chỉnh sửa giao diện
+              </Link>
+              <Link to="/admin/blog" className="flex items-center gap-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all font-bold text-sm">
+                <PlusCircle size={18} /> Đăng bài viết mới
+              </Link>
+              <Link to="/admin/system" className="flex items-center gap-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all font-bold text-sm">
+                <Settings size={18} /> Cài đặt hệ thống
+              </Link>
+            </div>
           </div>
-        ))}
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+          <h3 className="font-black text-xl text-slate-900">Trạng thái hệ thống</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-500">Dung lượng ổ đĩa</span>
+              <span className="text-sm font-black text-emerald-500">Ổn định</span>
+            </div>
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 w-[15%]"></div>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-sm font-bold text-slate-500">Bảo mật SSL</span>
+              <span className="text-sm font-black text-emerald-500">Bật</span>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-sm font-bold text-slate-500">Tốc độ tải trang</span>
+              <span className="text-sm font-black text-blue-600">Tuyệt vời</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 );
 
-const StatCard: React.FC<{ label: string, value: any, color: string }> = ({ label, value, color }) => (
-  <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 space-y-1 md:space-y-2">
-    <p className="text-slate-500 text-xs md:text-sm font-medium">{label}</p>
-    <p className={`text-2xl md:text-4xl font-black text-${color}-600`}>{value}</p>
-  </div>
-);
+const StatCard: React.FC<{ label: string, value: any, color: string, icon: React.ReactNode, trend?: string }> = ({ label, value, color, icon, trend }) => {
+  const colorMap: any = {
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    indigo: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    orange: "text-orange-600 bg-orange-50 border-orange-100",
+    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100"
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
+      <div className="flex justify-between items-start mb-4">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colorMap[color] || 'text-slate-600 bg-slate-50'}`}>
+          {icon}
+        </div>
+        {trend && (
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none bg-slate-50 px-2 py-1 rounded-md">{trend}</span>
+        )}
+      </div>
+      <div>
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-4xl font-black text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">{value}</p>
+      </div>
+    </div>
+  );
+};
 
 const ContentManager: React.FC = () => {
   const { state, updateState } = useApp();
