@@ -24,6 +24,8 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
+let lastMongoError = null;
+
 console.log(">>> [INIT] Checking MONGODB_URI...");
 if (MONGODB_URI) {
     console.log(">>> [INIT] MONGODB_URI found! Attempting connection...");
@@ -33,15 +35,16 @@ if (MONGODB_URI) {
     })
         .then(() => {
             console.log(">>> [INIT] SUCCESS: Connected to MongoDB Atlas");
+            lastMongoError = null;
             migrateDataIfNeeded();
         })
         .catch(err => {
+            lastMongoError = err.message;
             console.error(">>> [INIT] ERROR: MongoDB Connection Failed:", err.message);
-            console.error(">>> [INIT] Full error:", err);
         });
 } else {
-    console.error(">>> [INIT] CRITICAL WARNING: MONGODB_URI is MISSING from environment variables!");
-    console.warn(">>> [INIT] Falling back to ephemeral db.json. DATA WILL BE LOST ON RESTART.");
+    lastMongoError = "Missing MONGODB_URI environment variable";
+    console.error(">>> [INIT] CRITICAL WARNING: MONGODB_URI is MISSING!");
 }
 
 // --- MongoDB Schema ---
