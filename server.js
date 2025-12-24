@@ -155,9 +155,10 @@ app.get('/api/status', (req, res) => {
         mongodb_uri_exists: !!process.env.MONGODB_URI,
         mongodb_connection_state: mongoose.connection.readyState,
         mongodb_state_desc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
+        mongodb_last_error: lastMongoError,
         cloudinary_configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
         server_uptime: process.uptime(),
-        env: process.env.NODE_ENV || 'development'
+        env: process.env.NODE_ENV || 'production'
     });
 });
 
