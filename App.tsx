@@ -43,8 +43,8 @@ const App: React.FC = () => {
           if (!data.config) data.config = INITIAL_CONFIG;
           if (!data.achievements) data.achievements = INITIAL_ACHIEVEMENTS;
           if (!data.messages) data.messages = [];
-          if (!data.publicDocuments) data.publicDocuments = INITIAL_DOCUMENTS; // Add publicDocuments fallback
-          if (!data.testimonials) data.testimonials = INITIAL_TESTIMONIALS;
+          if (!data.publicDocuments) data.publicDocuments = INITIAL_DOCUMENTS;
+          if (!data.testimonials || data.testimonials.length === 0) data.testimonials = INITIAL_TESTIMONIALS;
 
           const adminCred = localStorage.getItem('bm_admin_cred');
           setState({ ...data, isAuthenticated: !!adminCred });
@@ -68,7 +68,7 @@ const App: React.FC = () => {
           if (!parsed.publicDocuments) {
             parsed.publicDocuments = INITIAL_DOCUMENTS;
           }
-          if (!parsed.testimonials) {
+          if (!parsed.testimonials || parsed.testimonials.length === 0) {
             parsed.testimonials = INITIAL_TESTIMONIALS;
           }
 

@@ -42,6 +42,23 @@ const HomePage: React.FC = () => {
   const [docSearchQuery, setDocSearchQuery] = useState('');
   const [docCurrentPage, setDocCurrentPage] = useState(1);
   const docsPerPage = 5;
+  const [currentTestiPage, setCurrentTestiPage] = useState(0);
+  const testiItemsPerPage = 2;
+  const testimonialsList = (state.testimonials && state.testimonials.length > 0 ? state.testimonials : INITIAL_TESTIMONIALS).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const testiTotalPages = Math.ceil(testimonialsList.length / testiItemsPerPage);
+
+  React.useEffect(() => {
+    if (testiTotalPages <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentTestiPage((prev) => (prev + 1) % testiTotalPages);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [testiTotalPages]);
+
+  const currentTestimonials = testimonialsList.slice(
+    currentTestiPage * testiItemsPerPage,
+    (currentTestiPage + 1) * testiItemsPerPage
+  );
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,35 +358,66 @@ const HomePage: React.FC = () => {
           ))}
         </div>
 
+        {/* Glow Blobs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-white/10 rounded-full blur-[150px] pointer-events-none"></div>
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="mb-16">
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase border-b-2 border-white/20 pb-6 inline-block">
+          <div className="mb-16 border-b border-white/10 pb-8">
+            <h2 className="text-3xl md:text-4xl font-black text-white tracking-[0.1em] uppercase">
               Phụ huynh học sinh nói về chúng tôi
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-            {state.testimonials?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((t) => (
-              <div key={t.id} className="flex flex-col md:flex-row gap-8 items-start group">
-                <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl group-hover:scale-105 transition-transform duration-500">
-                  <img src={getAssetPath(t.image || (t.role === 'PHHS' ? '/assets/3d/women.png' : '/assets/3d/cap.png'))} className="w-full h-full object-cover" alt={t.name} />
-                </div>
-                <div className="space-y-4">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={18} className={i < t.rating ? "fill-orange-400 text-orange-400" : "text-white/20"} />
-                    ))}
+          <div className="relative group/carousel">
+            {/* Arrows */}
+            <button
+              onClick={() => setCurrentTestiPage((prev) => (prev - 1 + testiTotalPages) % testiTotalPages)}
+              className="absolute left-[-40px] md:left-[-80px] top-1/2 -translate-y-1/2 w-14 h-14 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white/10 transition-all z-20 hidden md:flex opacity-0 group-hover/carousel:opacity-100"
+            >
+              <ChevronLeft size={32} strokeWidth={1} />
+            </button>
+            <button
+              onClick={() => setCurrentTestiPage((prev) => (prev + 1) % testiTotalPages)}
+              className="absolute right-[-40px] md:right-[-80px] top-1/2 -translate-y-1/2 w-14 h-14 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white/10 transition-all z-20 hidden md:flex opacity-0 group-hover/carousel:opacity-100"
+            >
+              <ChevronRight size={32} strokeWidth={1} />
+            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 transition-all duration-500 min-h-[300px]">
+              {currentTestimonials.map((t) => (
+                <div key={t.id} className="flex flex-col md:flex-row gap-8 items-start group animate-in fade-in slide-in-from-right-8 duration-500">
+                  <div className="w-32 h-32 md:w-36 md:h-36 shrink-0 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                    <img src={getAssetPath(t.image || (t.role === 'PHHS' ? '/assets/3d/women.png' : '/assets/3d/cap.png'))} className="w-full h-full object-cover" alt={t.name} />
                   </div>
-                  <p className="text-white/90 text-lg font-medium leading-relaxed italic">
-                    "{t.content}"
-                  </p>
-                  <div className="pt-2">
-                    <span className="text-white font-black text-xl tracking-tight uppercase">{t.name}</span>
-                    <span className="text-white/40 font-black text-sm uppercase tracking-widest ml-3">/ {t.role}</span>
+                  <div className="space-y-4">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={16} className={i < t.rating ? "fill-orange-400 text-orange-400" : "text-white/20"} />
+                      ))}
+                    </div>
+                    <p className="text-white/90 text-base md:text-lg font-medium leading-relaxed italic">
+                      "{t.content}"
+                    </p>
+                    <div className="pt-2">
+                      <span className="text-white font-black text-lg md:text-xl tracking-tight uppercase">{t.name}</span>
+                      <span className="text-white/40 font-black text-xs md:text-sm uppercase tracking-widest ml-3">/ {t.role}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="flex justify-center gap-3 mt-16">
+              {[...Array(testiTotalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentTestiPage(i)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${currentTestiPage === i ? 'bg-white scale-125' : 'bg-white/20 hover:bg-white/40'}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -674,6 +722,7 @@ const CourseDetailModal: React.FC<{ course: any, onClose: () => void }> = ({ cou
     setSubmitted(true);
     setTimeout(() => onClose(), 2000);
   };
+
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 overflow-hidden">

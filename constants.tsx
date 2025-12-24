@@ -156,7 +156,7 @@ export const INITIAL_TESTIMONIALS: Testimonial[] = [
     id: '1',
     name: 'Minh Hằng',
     role: 'PHHS',
-    content: 'Gia đình cháu Ngọc Lâm chân thành cảm ơn các thầy cô! Hẹn gặp lại các thầy cô ở trại hè sau! (Cháu đang muốn sang năm đi trại hè ở Mỹ) Hi hi. Các con chơi vui quá! Con bảo là con rất thích! Sang năm mẹ lại cho con đi nữa. Hi! Cảm ơn các thầy cô BME rất nhiều!',
+    content: 'Gia đình cháu Ngọc Lâm chân thành cảm ơn các thầy cô! Hẹn gặp lại các thầy cô ở trại hè sau! ( Cháu đang muốn sang năm đi trại hè ở Mỹ) Hi hi . Các con chơi vui quá! Con bảo là con rất thích! Sang năm mẹ lại cho con đi nữa. Hi! Cảm ơn các thầy cô BME rất nhiều!',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
     order: 1
@@ -169,5 +169,41 @@ export const INITIAL_TESTIMONIALS: Testimonial[] = [
     rating: 5,
     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200',
     order: 2
+  },
+  {
+    id: '3',
+    name: 'Chi Trần',
+    role: 'PHHS',
+    content: 'Cảm ơn các cô, chú. Nhìn ánh mắt bọn trẻ long lanh, thích thú và vui sướng. Chúc thầy cô và các trò có chuyến bay an lành và tốt đẹp',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200',
+    order: 3
+  },
+  {
+    id: '4',
+    name: 'Nguyễn Hải Yến',
+    role: 'PHHS',
+    content: 'Cảm ơn BME, cảm ơn các cô chú đã cho các con khoảng thời gian trải nghiệm tuyệt vời !!!',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&q=80&w=200',
+    order: 4
+  },
+  {
+    id: '5',
+    name: 'Thảo Mit',
+    role: 'PHHS',
+    content: 'Cảm ơn BME đã cho các con cuộc hành trình trải nghiệm thật thú vị và bổ ích, đã giúp các con học hỏi thêm được rất nhiều kiến thức, có tính tự giác, chủ động trong việc học tập! Tôi xin gửi lời cảm ơn chân thành tới trưởng đoàn, các groupleader tại BME!',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&q=80&w=200',
+    order: 5
+  },
+  {
+    id: '6',
+    name: 'Vũ Thu Trang',
+    role: 'PHHS',
+    content: 'Cảm ơn các cô chú BME đã cho các con tình cảm ấm áp như ở gia đình, dù các con ở xa gia đình! Chỉ cần nhìn thấy nụ cười của các bạn nhỏ là các bố mẹ cũng vui lây! Cảm ơn các cô chú đã rất nhiệt tình vì các con!',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    order: 6
   }
 ];
