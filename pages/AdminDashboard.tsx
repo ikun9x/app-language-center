@@ -1376,22 +1376,13 @@ const DocumentsManager = () => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/delete-file`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: doc.url })
+      await deletePhysicalFile(doc.url);
+      updateState({
+        publicDocuments: state.publicDocuments.filter(d => d.id !== doc.id)
       });
-
-      if (response.ok) {
-        updateState({
-          publicDocuments: state.publicDocuments.filter(d => d.id !== doc.id)
-        });
-        toast.success('Đã xóa tài liệu');
-      } else {
-        toast.error('Lỗi khi xóa tài liệu');
-      }
+      toast.success('Đã xóa tài liệu');
     } catch (error) {
-      toast.error('Không thể kết nối đến server');
+      toast.error('Lỗi khi xóa tài liệu trên cloud');
     }
   };
 
