@@ -3,10 +3,20 @@ import React, { createContext, useContext } from 'react';
 import { SiteConfig, Course, Teacher, Achievement, AppState, GuestMessage } from './types';
 
 // --- Context and Hook (Moved here to avoid circular dependencies) ---
+// --- Constants for Environment ---
+const isLocalDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// IMPORTANT: Replace this with your actual Render/Production Backend URL
+// Example: 'https://binhminh-backend.onrender.com'
+const PRODUCTION_API_URL = '';
+
+export const API_BASE_URL = isLocalDev ? 'http://localhost:5001' : PRODUCTION_API_URL;
+
 export const AppContext = createContext<{
   state: AppState;
   updateState: (newState: Partial<AppState>) => void;
   addMessage: (msg: Omit<GuestMessage, 'id' | 'timestamp' | 'replied'>) => void;
+  apiBaseUrl: string;
 } | null>(null);
 
 export const useApp = () => {

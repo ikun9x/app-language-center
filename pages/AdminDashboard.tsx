@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useApp } from '../constants';
+import { useApp, API_BASE_URL } from '../constants';
 import { getAssetPath } from '../utils';
 import { toast } from 'react-toastify';
 import {
@@ -32,7 +32,6 @@ import {
   HardDrive
 } from 'lucide-react';
 const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE_URL = isLocalDev ? 'http://localhost:5001' : '';
 
 const deletePhysicalFile = async (url?: string) => {
   if (!url) return;

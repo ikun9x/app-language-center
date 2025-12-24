@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppState, GuestMessage } from './types';
-import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, AppContext } from './constants';
+import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, AppContext, API_BASE_URL } from './constants';
 
 // --- Components ---
 import Navbar from './components/Navbar';
@@ -30,7 +30,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/data');
+        const res = await fetch(`${API_BASE_URL}/api/data`);
         if (!res.ok) throw new Error('Server not reachable');
         const data = await res.json();
 
@@ -106,7 +106,7 @@ const App: React.FC = () => {
       }));
 
       try {
-        await fetch('/api/data', {
+        await fetch(`${API_BASE_URL}/api/data`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(state)
@@ -156,7 +156,7 @@ const App: React.FC = () => {
   if (loading) return <div className="min-h-screen bg-slate-900 flex items-center justify-center"><div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <AppContext.Provider value={{ state, updateState, addMessage }}>
+    <AppContext.Provider value={{ state, updateState, addMessage, apiBaseUrl: API_BASE_URL }}>
       <HashRouter>
         <div className="min-h-screen flex flex-col">
           <Routes>
