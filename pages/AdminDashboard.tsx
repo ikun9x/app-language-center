@@ -1327,6 +1327,8 @@ const DocumentsManager = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [newDocLabel, setNewDocLabel] = useState('');
   const [newDocDescription, setNewDocDescription] = useState('');
+  const [newDocOrder, setNewDocOrder] = useState('0');
+  const [adminDocSearch, setAdminDocSearch] = useState('');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1355,11 +1357,13 @@ const DocumentsManager = () => {
           description: newDocDescription.trim(),
           type: 'PDF',
           uploadDate: new Date().toLocaleDateString('vi-VN'),
-          url
+          url,
+          order: parseInt(newDocOrder) || 0
         };
-        updateState({ publicDocuments: [...state.publicDocuments, newDoc] });
+        updateState({ publicDocuments: [...(state.publicDocuments || []), newDoc] });
         setNewDocLabel('');
         setNewDocDescription('');
+        setNewDocOrder('0');
         toast.success('Đã tải lên tài liệu thành công');
       } else {
         toast.error('Lỗi khi tải lên tệp');
@@ -1377,7 +1381,7 @@ const DocumentsManager = () => {
     try {
       await deletePhysicalFile(doc.url);
       updateState({
-        publicDocuments: state.publicDocuments.filter(d => d.id !== doc.id)
+        publicDocuments: (state.publicDocuments || []).filter(d => d.id !== doc.id)
       });
       toast.success('Đã xóa tài liệu');
     } catch (error) {
@@ -1385,105 +1389,158 @@ const DocumentsManager = () => {
     }
   };
 
+  const updateOrder = (docId: string, newOrder: number) => {
+    updateState({
+      publicDocuments: (state.publicDocuments || []).map(d =>
+        d.id === docId ? { ...d, order: newOrder } : d
+      )
+    });
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
         <div className="flex-1">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Văn bản Công khai</h2>
           <p className="text-slate-500 font-medium mt-1">Quản lý các tài liệu PDF công khai của trung tâm</p>
         </div>
 
-        <div className="flex flex-col gap-4 w-full md:w-auto">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              placeholder="Nhãn văn bản (VD: Quyết định thành lập...)"
-              className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-slate-700 min-w-[300px]"
-              value={newDocLabel}
-              onChange={(e) => setNewDocLabel(e.target.value)}
-            />
-            <label className="flex items-center justify-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 whitespace-nowrap">
-              {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
-              <span>Tải lên PDF</span>
-              <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
-            </label>
+        <div className="flex flex-col gap-4 w-full lg:w-3/4">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+            <div className="sm:col-span-8 flex flex-col gap-2">
+              <input
+                type="text"
+                placeholder="Nhãn văn bản (VD: Quyết định thành lập...)"
+                className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-slate-700 w-full"
+                value={newDocLabel}
+                onChange={(e) => setNewDocLabel(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Mô tả (không bắt buộc)..."
+                className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-medium text-slate-600 w-full"
+                value={newDocDescription}
+                onChange={(e) => setNewDocDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-4 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Thứ tự:</span>
+                <input
+                  type="number"
+                  className="w-full px-4 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-center"
+                  value={newDocOrder}
+                  onChange={(e) => setNewDocOrder(e.target.value)}
+                />
+              </div>
+              <label className="flex items-center justify-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 whitespace-nowrap">
+                {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
+                <span>Tải lên PDF</span>
+                <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
+              </label>
+            </div>
           </div>
-          <input
-            type="text"
-            placeholder="Mô tả nội dung văn bản (không bắt buộc)..."
-            className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-medium text-slate-600 w-full"
-            value={newDocDescription}
-            onChange={(e) => setNewDocDescription(e.target.value)}
-          />
         </div>
       </div>
 
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <div className="p-8 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="relative w-full md:w-96 group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm tài liệu đã đăng..."
+              className="w-full bg-white border-2 border-slate-100 rounded-2xl py-3 pl-14 pr-6 text-slate-900 font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
+              value={adminDocSearch}
+              onChange={(e) => setAdminDocSearch(e.target.value)}
+            />
+          </div>
+          <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+            {(state.publicDocuments || []).length} Tài liệu
+          </div>
+        </div>
+
         <table className="w-full text-left">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100">
               <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Tên tài liệu</th>
-              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Loại</th>
+              <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center" style={{ width: '100px' }}>Thứ tự</th>
               <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Ngày đăng</th>
               <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {state.publicDocuments.length > 0 ? (
-              state.publicDocuments.map(doc => (
-                <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
-                  <td className="px-8 py-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
-                        <FileText size={24} />
+            {(() => {
+              const filtered = (state.publicDocuments || []).filter(doc =>
+                (doc.label || doc.name).toLowerCase().includes(adminDocSearch.toLowerCase())
+              ).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+              if (filtered.length > 0) {
+                return filtered.map(doc => (
+                  <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="px-8 py-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
+                          <FileText size={24} />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-black text-slate-900 text-xl leading-tight mb-1">{doc.label || doc.name}</span>
+                          {doc.description && (
+                            <p className="text-sm text-slate-500 font-medium mb-2 leading-relaxed max-w-md">
+                              {doc.description}
+                            </p>
+                          )}
+                          <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded w-fit italic">
+                            Tệp gốc: {doc.name}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-black text-slate-900 text-xl leading-tight mb-1">{doc.label || doc.name}</span>
-                        {doc.description && (
-                          <p className="text-sm text-slate-500 font-medium mb-2 leading-relaxed max-w-md">
-                            {doc.description}
-                          </p>
-                        )}
-                        <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded w-fit italic">
-                          Tệp gốc: {doc.name}
-                        </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <input
+                        type="number"
+                        className="w-16 px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-slate-700 focus:border-blue-500 outline-none"
+                        value={doc.order || 0}
+                        onChange={(e) => updateOrder(doc.id, parseInt(e.target.value) || 0)}
+                      />
+                    </td>
+                    <td className="px-8 py-6 text-slate-500 font-medium text-sm">{doc.uploadDate}</td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end space-x-2">
+                        <a
+                          href={getAssetPath(doc.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-3 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all"
+                        >
+                          <ExternalLink size={18} />
+                        </a>
+                        <button
+                          onClick={() => handleDelete(doc)}
+                          className="p-3 text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold uppercase">{doc.type}</span>
-                  </td>
-                  <td className="px-8 py-6 text-slate-500 font-medium">{doc.uploadDate}</td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end space-x-2">
-                      <a
-                        href={getAssetPath(doc.url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-3 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all"
-                      >
-                        <ExternalLink size={18} />
-                      </a>
-                      <button
-                        onClick={() => handleDelete(doc)}
-                        className="p-3 text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                    </td>
+                  </tr>
+                ));
+              }
+
+              return (
+                <tr>
+                  <td colSpan={4} className="px-8 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-4 opacity-30">
+                      <FileText size={48} />
+                      <p className="font-black text-xl">
+                        {adminDocSearch ? 'Không tìm thấy tài liệu nào khớp' : 'Chưa có tài liệu nào'}
+                      </p>
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-8 py-20 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-4 opacity-30">
-                    <FileText size={48} />
-                    <p className="font-black text-xl">Chưa có tài liệu nào</p>
-                  </div>
-                </td>
-              </tr>
-            )}
+              );
+            })()}
           </tbody>
         </table>
       </div>

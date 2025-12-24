@@ -324,7 +324,7 @@ const HomePage: React.FC = () => {
                   {(() => {
                     const filtered = (state.publicDocuments || []).filter(doc =>
                       (doc.label || doc.name).toLowerCase().includes(docSearchQuery.toLowerCase())
-                    );
+                    ).sort((a, b) => (a.order || 0) - (b.order || 0));
                     const startIndex = (docCurrentPage - 1) * docsPerPage;
                     const paginated = filtered.slice(startIndex, startIndex + docsPerPage);
 
@@ -346,9 +346,6 @@ const HomePage: React.FC = () => {
                                   </span>
                                   <span className="text-[10px] font-bold text-blue-500 flex items-center gap-1">
                                     <Globe size={10} /> Công khai
-                                  </span>
-                                  <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded uppercase">
-                                    {doc.type}
                                   </span>
                                 </div>
                               </div>
@@ -391,7 +388,7 @@ const HomePage: React.FC = () => {
               {(() => {
                 const filtered = (state.publicDocuments || []).filter(doc =>
                   (doc.label || doc.name).toLowerCase().includes(docSearchQuery.toLowerCase())
-                );
+                ).sort((a, b) => (a.order || 0) - (b.order || 0));
                 const startIndex = (docCurrentPage - 1) * docsPerPage;
                 const paginated = filtered.slice(startIndex, startIndex + docsPerPage);
 
@@ -404,7 +401,7 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="flex flex-col min-w-0">
                           <h4 className="font-bold text-slate-900 truncate text-sm">{doc.label || doc.name}</h4>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{doc.uploadDate} • {doc.type}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{doc.uploadDate}</span>
                         </div>
                       </div>
                       <a

@@ -46,6 +46,7 @@ export interface PublicDocument {
   type: string;
   uploadDate: string;
   url: string;
+  order?: number;
 }
 
 export interface SiteConfig {
