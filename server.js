@@ -4,6 +4,21 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.local' });
+dotenv.config();
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.warn(">>> WARNING: Cloudinary credentials missing. File uploads will not work.");
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,31 +38,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(UPLOAD_DIR));
 app.use('/pdfs', express.static(PDF_DIR));
 
-// Multer configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, UPLOAD_DIR);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
+// Multer configuration (using memory storage for cloud upload)
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const pdfStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, PDF_DIR);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
 const uploadPdf = multer({
-    storage: pdfStorage,
+    storage: storage,
     fileFilter: (req, file, cb) => {
         if (path.extname(file.originalname).toLowerCase() === '.pdf') {
             cb(null, true);
@@ -96,32 +92,54 @@ app.post('/api/data', (req, res) => {
 });
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-    }
-    const url = `http://localhost:5001/uploads/${req.file.filename}`;
-    res.json({ url });
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const stream = cloudinary.uploader.upload_stream(
+        { folder: 'binhminh_uploads' },
+        (error, result) => {
+            if (error) return res.status(500).json({ error: error.message });
+            res.json({ url: result.secure_url });
+        }
+    );
+    stream.end(req.file.buffer);
 });
 
 app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-    }
-    const url = `http://localhost:5001/pdfs/${req.file.filename}`;
-    res.json({ url });
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const stream = cloudinary.uploader.upload_stream(
+        { folder: 'binhminh_pdfs', resource_type: 'raw' },
+        (error, result) => {
+            if (error) return res.status(500).json({ error: error.message });
+            res.json({ url: result.secure_url });
+        }
+    );
+    stream.end(req.file.buffer);
 });
 
-app.delete('/api/delete-file', (req, res) => {
+app.delete('/api/delete-file', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
 
     try {
+        if (url.includes('cloudinary.com')) {
+            // Extract public_id for Cloudinary deletion
+            // Example: https://res.cloudinary.com/demo/image/upload/v1570975139/sample.jpg
+            const parts = url.split('/');
+            const filename = parts[parts.length - 1];
+            const publicId = filename.split('.')[0];
+            const folder = url.includes('binhminh_pdfs') ? 'binhminh_pdfs' : 'binhminh_uploads';
+
+            await cloudinary.uploader.destroy(`${folder}/${publicId}`, {
+                resource_type: url.includes('binhminh_pdfs') ? 'raw' : 'image'
+            });
+            return res.json({ success: true });
+        }
+
+        // Fallback for local files
         const filename = path.basename(url);
         let filePath = path.join(UPLOAD_DIR, filename);
-
-        if (!fs.existsSync(filePath)) {
-            filePath = path.join(PDF_DIR, filename);
-        }
+        if (!fs.existsSync(filePath)) filePath = path.join(PDF_DIR, filename);
 
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
@@ -200,6 +218,18 @@ app.get('/api/garbage-collector', (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Serve static frontend in production
+const DIST_PATH = path.join(__dirname, 'dist');
+if (fs.existsSync(DIST_PATH)) {
+    app.use(express.static(DIST_PATH));
+    app.get(/.*/, (req, res) => {
+        // Only serve index.html for non-API routes
+        if (!req.path.startsWith('/api/') && !req.path.startsWith('/uploads/') && !req.path.startsWith('/pdfs/')) {
+            res.sendFile(path.join(DIST_PATH, 'index.html'));
+        }
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Backend server running at http://localhost:${PORT}`);

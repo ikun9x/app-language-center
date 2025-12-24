@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
 
   return {
-    base: isProduction ? '/app-language-center/' : '/',
+    base: (env.GITHUB_PAGES === 'true') ? '/app-language-center/' : '/',
     server: {
       port: 3000,
       host: '0.0.0.0',

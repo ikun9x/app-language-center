@@ -31,12 +31,19 @@ import {
   ExternalLink,
   HardDrive
 } from 'lucide-react';
-const UPLOAD_BASE_URL = 'http://localhost:5001/uploads/';
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = isLocalDev ? 'http://localhost:5001' : '';
 
 const deletePhysicalFile = async (url?: string) => {
-  if (!url || !url.startsWith(UPLOAD_BASE_URL)) return;
+  if (!url) return;
+  // Handle both local development uploads and Cloudinary production uploads
+  const isLocal = url.includes('localhost:5001/uploads') || url.includes('localhost:5001/pdfs');
+  const isCloud = url.includes('cloudinary.com');
+
+  if (!isLocal && !isCloud) return;
+
   try {
-    await fetch('http://localhost:5001/api/delete-file', {
+    await fetch(`${API_BASE_URL}/api/delete-file`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url }),
@@ -154,7 +161,7 @@ const Overview: React.FC<{ state: any }> = ({ state }) => (
 const StatCard: React.FC<{ label: string, value: any, color: string }> = ({ label, value, color }) => (
   <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-2">
     <p className="text-slate-500 text-sm font-medium">{label}</p>
-    <p className={`text-4xl font-black text-${color}-600`}>{value}</p>
+    <p className={`text-4xl font-black text - ${color}-600`}>{value}</p>
   </div>
 );
 
@@ -180,7 +187,7 @@ const ContentManager: React.FC = () => {
         await deletePhysicalFile(localConfig.brandLogoImage);
       }
 
-      const res = await fetch('http://localhost:5001/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -199,7 +206,7 @@ const ContentManager: React.FC = () => {
     if (!confirm("Bạn có chắc chắn muốn xoá logo này khỏi máy chủ?")) return;
 
     try {
-      const res = await fetch('http://localhost:5001/api/delete-file', {
+      const res = await fetch(`${API_BASE_URL}/api/delete-file`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: localConfig.brandLogoImage }),
@@ -242,7 +249,7 @@ const ContentManager: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-2">Tên viết tắt / Logo Text (BM)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Tên viết tắt /Logo Text (BM)</label>
               <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.brandShortName} onChange={e => setLocalConfig({ ...localConfig, brandShortName: e.target.value })} />
             </div>
             <div>
@@ -326,7 +333,7 @@ const ContentManager: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2">Số giấy phép / Mã số thuế (MSDN)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Số giấy phép /Mã số thuế (MSDN)</label>
                 <textarea
                   className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm resize-none"
                   rows={2}
@@ -452,28 +459,30 @@ const LeadsManager: React.FC = () => {
                     >
                       <img src={getAssetPath("/images/zalo.png")} className="w-5 h-5 object-contain rounded" alt="Zalo" />
                       Zalo
-                    </a>
+                    </a >
                     <button
                       onClick={() => setReplyLead(m)}
                       className="bg-blue-50 text-blue-600 px-4 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition transform active:scale-95 shadow-sm"
                     >
                       Phản hồi Email
                     </button>
-                  </div>
-                </td>
-              </tr>
+                  </div >
+                </td >
+              </tr >
             ))}
-          </tbody>
-        </table>
-        {state.messages.length === 0 && (
-          <div className="p-32 text-center space-y-4">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
-              <MessageSquare size={40} />
+          </tbody >
+        </table >
+        {
+          state.messages.length === 0 && (
+            <div className="p-32 text-center space-y-4">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
+                <MessageSquare size={40} />
+              </div>
+              <p className="text-slate-400 font-bold text-lg">Chưa có yêu cầu nào được gửi đến.</p>
             </div>
-            <p className="text-slate-400 font-bold text-lg">Chưa có yêu cầu nào được gửi đến.</p>
-          </div>
-        )}
-      </div>
+          )
+        }
+      </div >
 
       {replyLead && (
         <EmailReplyModal
@@ -481,7 +490,7 @@ const LeadsManager: React.FC = () => {
           onClose={() => setReplyLead(null)}
         />
       )}
-    </div>
+    </div >
   );
 };
 
@@ -718,7 +727,7 @@ const CourseModal: React.FC<{ course: any, onClose: () => void, onSave: (data: a
         await deletePhysicalFile(formData.image);
       }
 
-      const res = await fetch('http://localhost:5001/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: formDataUpload,
       });
@@ -834,13 +843,13 @@ const CourseModal: React.FC<{ course: any, onClose: () => void, onSave: (data: a
                 <div className="flex gap-2 p-1 bg-white rounded-xl">
                   <button
                     onClick={() => setImageTab('upload')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition ${imageTab === 'upload' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+                    className={`flex-1 flex items-center justify - center gap - 2 py - 2 rounded - lg text - sm font - bold transition ${imageTab === 'upload' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
                   >
-                    <Upload size={16} /> Tải lên / Paste
+                    <Upload size={16} /> Tải lên /Paste
                   </button>
                   <button
                     onClick={() => setImageTab('url')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition ${imageTab === 'url' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+                    className={`flex-1 flex items-center justify - center gap - 2 py - 2 rounded - lg text - sm font - bold transition ${imageTab === 'url' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'} `}
                   >
                     <LinkIcon size={16} /> URL
                   </button>
@@ -1050,7 +1059,7 @@ const TeachersManager: React.FC = () => {
                 )}
               </div>
               <div className="absolute -bottom-2 -right-2">
-                <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg text-white ${t.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'}`}>
+                <span className={`px - 3 py - 1 text - [10px] font-black uppercase tracking - widest rounded - full shadow - lg text - white ${t.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'} `}>
                   {t.gender === 'female' ? 'Nữ' : 'Nam'}
                 </span>
               </div>
@@ -1141,7 +1150,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
         await deletePhysicalFile(formData.image);
       }
 
-      const res = await fetch('http://localhost:5001/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: formDataUpload,
       });
@@ -1254,7 +1263,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chức vụ / Chuyên môn</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chức vụ /Chuyên môn</label>
                   <input
                     className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
                     value={formData.role}
@@ -1332,7 +1341,7 @@ const DocumentsManager = () => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/upload-pdf`, {
+      const response = await fetch(`${API_BASE_URL}/api/upload-pdf`, {
         method: 'POST',
         body: formData,
       });
@@ -1362,7 +1371,7 @@ const DocumentsManager = () => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5001/api/delete-file`, {
+      const response = await fetch(`${API_BASE_URL}/api/delete-file`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: doc.url })
@@ -1466,7 +1475,7 @@ const SystemOptimizer: React.FC = () => {
   const scanForGarbage = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/garbage-collector');
+      const res = await fetch(`${API_BASE_URL}/api/garbage-collector`);
       const data = await res.json();
       setJunkFiles(data.files);
       setScanned(true);
@@ -1482,7 +1491,7 @@ const SystemOptimizer: React.FC = () => {
     if (!window.confirm(`Bạn có chắc muốn xóa ${junkFiles.length} tệp này?`)) return;
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/garbage-collector?action=delete');
+      const res = await fetch(`${API_BASE_URL}/api/garbage-collector?action=delete`);
       const data = await res.json();
       if (data.success) {
         toast.success(`Đã xóa thành công ${data.deleted} tệp rác`);
