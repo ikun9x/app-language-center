@@ -24,29 +24,18 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
-let lastMongoError = "Connecting/Initial attempt...";
-let mongoConnectionTime = null;
 
-console.log(">>> [INIT] Checking MONGODB_URI...");
 if (MONGODB_URI) {
-    console.log(">>> [INIT] MONGODB_URI found! Attempting connection...");
-    mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000
-    })
+    mongoose.connect(MONGODB_URI)
         .then(() => {
             console.log(">>> [INIT] SUCCESS: Connected to MongoDB Atlas");
-            lastMongoError = null;
-            mongoConnectionTime = new Date().toISOString();
             migrateDataIfNeeded();
         })
         .catch(err => {
-            lastMongoError = `FAILED at ${new Date().toLocaleTimeString()}: ${err.message}`;
             console.error(">>> [INIT] ERROR: MongoDB Connection Failed:", err.message);
         });
 } else {
-    lastMongoError = "Missing MONGODB_URI environment variable on Render";
-    console.error(">>> [INIT] CRITICAL WARNING: MONGODB_URI is MISSING!");
+    console.warn(">>> [INIT] WARNING: MONGODB_URI missing. Falling back to ephemeral db.json.");
 }
 
 // --- MongoDB Schema ---
@@ -153,19 +142,6 @@ app.get('/api/data', async (req, res) => {
     const data = readDB();
     console.log(">>> [GET] Served data from db.json (Fallback)");
     res.json({ ...data, _storage: 'file' });
-});
-
-app.get('/api/status', (req, res) => {
-    res.json({
-        mongodb_uri_exists: !!process.env.MONGODB_URI,
-        mongodb_connection_state: mongoose.connection.readyState,
-        mongodb_state_desc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
-        mongodb_last_error: lastMongoError,
-        mongodb_connection_time: mongoConnectionTime,
-        cloudinary_configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
-        server_uptime: process.uptime(),
-        env: process.env.NODE_ENV || 'production'
-    });
 });
 
 app.post('/api/data', async (req, res) => {
