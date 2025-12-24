@@ -20,7 +20,10 @@ import {
   Sparkles,
   Zap,
   Circle,
-  FileText
+  FileText,
+  Globe,
+  ExternalLink,
+  X
 } from 'lucide-react';
 
 import { toast } from 'react-toastify';
