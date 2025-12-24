@@ -171,7 +171,7 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white p-10 md:p-16 rounded-[3rem] shadow-sm flex flex-col justify-center space-y-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32"></div>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight relative z-10">Sứ mệnh chắp cánh <span className="text-blue-600 italic">ước mơ</span></h2>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight relative z-10">{state.config.aboutTitle || 'Về chúng tôi'}</h2>
             <p className="text-slate-600 text-lg leading-relaxed relative z-10 font-medium">{state.config.aboutText}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 relative z-10">
               <div className="space-y-4 p-6 bg-slate-50 rounded-3xl">

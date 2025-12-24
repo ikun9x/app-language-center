@@ -348,6 +348,30 @@ const ContentManager: React.FC = () => {
           </div>
         </div>
 
+        <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6 lg:col-span-2">
+          <h3 className="font-bold text-lg border-b pb-4">Về chúng tôi & Tầm nhìn</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Tiêu đề chính (Sứ mệnh chắp cánh ước mơ)</label>
+              <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.aboutTitle || ''} onChange={e => setLocalConfig({ ...localConfig, aboutTitle: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-2">Đoạn giới thiệu tổng quan</label>
+              <textarea className="w-full p-4 bg-slate-50 rounded-xl outline-none" rows={3} value={localConfig.aboutText} onChange={e => setLocalConfig({ ...localConfig, aboutText: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Tầm nhìn</label>
+                <textarea className="w-full p-4 bg-slate-50 rounded-xl outline-none" rows={3} value={localConfig.vision} onChange={e => setLocalConfig({ ...localConfig, vision: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Sứ mệnh</label>
+                <textarea className="w-full p-4 bg-slate-50 rounded-xl outline-none" rows={3} value={localConfig.mission} onChange={e => setLocalConfig({ ...localConfig, mission: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6">
           <h3 className="font-bold text-lg border-b pb-4">Thông tin liên hệ</h3>
           <div className="space-y-4">

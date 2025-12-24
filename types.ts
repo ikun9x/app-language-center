@@ -57,6 +57,7 @@ export interface SiteConfig {
   aboutText: string;
   mission: string;
   vision: string;
+  aboutTitle?: string;
   address: string;
   phone: string;
   zalo: string;
