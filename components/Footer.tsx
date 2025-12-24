@@ -79,11 +79,11 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Full-width Map Section */}
-      <div className="max-w-7xl mx-auto px-6 mt-16 relative z-10">
-        <div className="rounded-[2.5rem] overflow-hidden h-80 bg-slate-800 shadow-2xl border-4 border-slate-800/50">
+      <div className="mt-10 relative z-10 w-full">
+        <div className="h-96 bg-slate-800 shadow-2xl overflow-hidden border-y border-slate-800/50">
           <iframe
             src={state.config.googleMapsEmbed}
-            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+            className="w-full h-full border-0"
             loading="lazy"
             title="Google Maps"
           ></iframe>
