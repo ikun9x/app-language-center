@@ -110,7 +110,7 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     const originalName = req.file.originalname;
     const nameWithoutExt = path.parse(originalName).name;
 
-    // Sanitize filename: remove accents, replace non-alphanumeric with underscores
+    // Sanitize filename
     const sanitizedName = nameWithoutExt
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -118,24 +118,19 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
         .toLowerCase()
         .slice(0, 50);
 
-    const publicId = `${sanitizedName}_${Date.now()}`;
+    // IMPORTANT: For 'raw' resource type, including the extension in public_id 
+    // helps browsers and Cloudinary identify the file type.
+    const publicId = `${sanitizedName}_${Date.now()}.pdf`;
 
     const stream = cloudinary.uploader.upload_stream(
         {
             folder: 'binhminh_pdfs',
-            resource_type: 'image',
-            access_mode: 'public',
-            public_id: publicId,
-            format: 'pdf'
+            resource_type: 'raw',
+            public_id: publicId
         },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
-            // Explicitly ensure the URL ends in .pdf for browser recognition
-            let finalUrl = result.secure_url;
-            if (!finalUrl.toLowerCase().endsWith('.pdf')) {
-                finalUrl += '.pdf';
-            }
-            res.json({ url: finalUrl });
+            res.json({ url: result.secure_url });
         }
     );
     stream.end(req.file.buffer);
