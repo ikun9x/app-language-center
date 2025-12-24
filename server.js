@@ -13,7 +13,8 @@ dotenv.config();
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
 });
 
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
@@ -107,20 +108,17 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    console.log('Starting PDF upload to Cloudinary...');
+    console.log('Final attempt: Basic PDF upload...');
     const stream = cloudinary.uploader.upload_stream(
         {
-            folder: 'binhminh_documents',
-            resource_type: 'auto',
-            type: 'upload',
-            access_mode: 'public'
+            resource_type: 'auto'
         },
         (error, result) => {
             if (error) {
-                console.error('Cloudinary PDF Upload Error:', error);
+                console.error('Upload Error:', error);
                 return res.status(500).json({ error: error.message });
             }
-            console.log('PDF Upload Success:', result.secure_url);
+            console.log('Upload Result:', result.secure_url);
             res.json({ url: result.secure_url });
         }
     );
