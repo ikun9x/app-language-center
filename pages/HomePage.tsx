@@ -164,7 +164,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats / Highlights - Compact */}
-      <section className="relative z-40 -mt-20 md:-mt-24 px-6">
+      <section className="relative z-40 -mb-12 md:-mt-24 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'NĂM KINH NGHIỆM', value: state.config.statsYears || '10+', color: 'bg-rose-50', iconColor: 'bg-rose-500', icon: <BookOpen className="text-white" size={20} />, textColor: 'text-rose-600' },
@@ -186,7 +186,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section id="about" className="py-24 px-6 bg-slate-50/50">
+      <section id="about" className="py-16 px-6 bg-slate-50/50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white p-10 md:p-16 rounded-[3rem] shadow-sm flex flex-col justify-center space-y-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32"></div>
@@ -235,8 +235,8 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Courses */}
-      <section id="courses" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto space-y-20">
+      <section id="courses" className="py-16 px-6 bg-white">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-6">
             <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Lộ Trình Học Tập <span className="text-blue-600">Toàn Diện</span></h2>
             <p className="text-slate-500 max-w-2xl mx-auto text-lg font-medium">Các khóa học được thiết kế chuyên biệt, bám sát nhu cầu thực tế của từng độ tuổi và mục tiêu học tập.</p>
@@ -279,7 +279,7 @@ const HomePage: React.FC = () => {
       )}
 
       {/* Teachers */}
-      <section id="teachers" className="py-24 px-6 bg-slate-50/30">
+      <section id="teachers" className="py-16 px-6 bg-slate-50/30">
         <div className="max-w-7xl mx-auto text-center space-y-16">
           <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Đội Ngũ <span className="text-blue-600">Giảng Viên</span></h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -308,11 +308,11 @@ const HomePage: React.FC = () => {
                         <a
                           href={`https://zalo.me/${t.zalo || t.phone}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-sm border border-blue-100"
                           title="Chat Zalo"
-                          className="w-10 h-10 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
                         >
-                          <span className="text-[10px] font-black">Zalo</span>
+                          <img src="/images/zalo.png" className="w-6 h-6 object-contain" alt="Zalo" />
                         </a>
                       </div>
                       <span className="text-slate-700 text-lg font-bold tracking-tight">{t.phone}</span>
@@ -339,7 +339,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 bg-[#4a0d0d] relative overflow-hidden">
+      <section className="py-16 bg-[#4a0d0d] relative overflow-hidden">
         {/* Snow/Bubble Effect */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           {[...Array(20)].map((_, i) => (
@@ -363,8 +363,8 @@ const HomePage: React.FC = () => {
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-white/10 rounded-full blur-[150px] pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="mb-16 border-b border-white/10 pb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-white tracking-[0.1em] uppercase">
+          <div className="mb-10 border-b border-white/10 pb-6">
+            <h2 className="text-2xl md:text-3xl font-black text-white tracking-[0.1em] uppercase">
               Phụ huynh học sinh nói về chúng tôi
             </h2>
           </div>
@@ -423,9 +423,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Public Documents Section */}
-      <section id="documents" className="py-24 bg-white relative overflow-hidden">
+      <section id="documents" className="py-16 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <span className="bg-blue-50 text-blue-600 px-6 py-2 rounded-full text-sm font-black tracking-widest uppercase mb-4 inline-block">Niêm yết</span>
             <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Văn bản Công khai</h2>
             <div className="w-24 h-2 bg-blue-600 mx-auto mt-6 rounded-full"></div>
@@ -607,7 +607,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Contact Form */}
-      <section id="contact" className="py-24 px-4 md:px-6 bg-white overflow-hidden relative">
+      <section id="contact" className="py-16 px-4 md:px-6 bg-white overflow-hidden relative">
         <div className="max-w-6xl mx-auto">
           <div className="bg-slate-900 rounded-[3.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative">
             {/* 3D Laptop Icon in Background */}

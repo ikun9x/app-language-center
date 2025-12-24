@@ -63,8 +63,8 @@ const Navbar: React.FC = () => {
           <a href={`tel:${state.config.phone}`} className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:-translate-y-1 active:scale-95 text-sm md:text-base">
             {state.config.phone}
           </a>
-          <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="bg-[#0068ff] text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 hidden md:block text-sm md:text-base">
-            Zalo
+          <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 hidden md:flex border border-slate-100">
+            <img src="/images/zalo.png" className="w-7 h-7 object-contain" alt="Zalo" />
           </a>
         </div>
 
@@ -88,8 +88,9 @@ const Navbar: React.FC = () => {
               <a href={`tel:${state.config.phone}`} className="text-center bg-orange-500 text-white py-3 rounded-xl font-bold text-sm shadow-md">
                 Gọi ngay
               </a>
-              <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="text-center bg-[#0068ff] text-white py-3 rounded-xl font-bold text-sm shadow-md">
-                Zalo
+              <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="flex items-center justify-center bg-white border border-slate-100 py-3 rounded-xl shadow-md">
+                <img src="/images/zalo.png" className="w-6 h-6 object-contain" alt="Zalo" />
+                <span className="ml-2 font-bold text-slate-700 text-sm">Zalo</span>
               </a>
             </div>
           </div>
