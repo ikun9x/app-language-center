@@ -47,7 +47,11 @@ export const INITIAL_CONFIG: SiteConfig = {
   brandNamePrincipal: "BÌNH MINH",
   brandNameSub: "LANGUAGE CENTER",
   brandShortName: "",
-  brandLogoImage: "/uploads/1766506378705-208546692.png"
+  brandLogoImage: "/uploads/1766506378705-208546692.png",
+  statsYears: "10+",
+  statsTeachers: "50+",
+  statsCourses: "20+",
+  statsSatisfaction: "98%"
 };
 
 export const INITIAL_COURSES: Course[] = [

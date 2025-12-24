@@ -26,6 +26,7 @@ export interface Achievement {
   year: string;
   title: string;
   description: string;
+  order?: number;
 }
 
 export interface GuestMessage {
@@ -72,6 +73,11 @@ export interface SiteConfig {
   brandNameSub: string;
   brandShortName: string;
   brandLogoImage?: string;
+  // Dynamic Stats
+  statsYears?: string;
+  statsTeachers?: string;
+  statsCourses?: string;
+  statsSatisfaction?: string;
 }
 
 export type AppState = {

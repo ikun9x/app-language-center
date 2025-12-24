@@ -96,6 +96,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} />
           <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} />
           <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} />
+          <SidebarLink to="/admin/achievements" icon={<Trophy size={20} />} label="Thành tích" active={location.pathname === '/admin/achievements'} />
         </nav>
 
         <SidebarLink to="/" icon={<Home size={20} />} label="Trang chủ" active={false} />
@@ -117,6 +118,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="leads" element={<LeadsManager />} />
           <Route path="seo" element={<SeoManager />} />
           <Route path="teachers" element={<TeachersManager />} />
+          <Route path="achievements" element={<AchievementsManager />} />
           <Route path="documents" element={<DocumentsManager />} />
           <Route path="system" element={<SystemOptimizer />} />
           <Route path="compliance" element={<ComplianceManager />} />
@@ -231,6 +233,57 @@ const ContentManager: React.FC = () => {
         <button onClick={save} className="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2">
           <Save size={18} /> Lưu thay đổi
         </button>
+      </div>
+
+      {/* Dynamic Statistics Card */}
+      <div className="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl text-white">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-white/20 rounded-2xl">
+            <Trophy size={24} />
+          </div>
+          <div>
+            <h3 className="text-2xl font-black tracking-tight">Chỉ số thống kê</h3>
+            <p className="text-blue-100 text-sm font-medium">Cập nhật các con số ấn tượng hiển thị trên trang chủ</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Năm kinh nghiệm</label>
+            <input
+              className="w-full p-4 bg-white/10 hover:bg-white/20 focus:bg-white border-2 border-transparent focus:border-blue-300 rounded-2xl outline-none transition font-black text-xl text-white focus:text-blue-900"
+              value={localConfig.statsYears || ''}
+              onChange={e => setLocalConfig({ ...localConfig, statsYears: e.target.value })}
+              placeholder="VD: 10+"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Giảng viên giỏi</label>
+            <input
+              className="w-full p-4 bg-white/10 hover:bg-white/20 focus:bg-white border-2 border-transparent focus:border-blue-300 rounded-2xl outline-none transition font-black text-xl text-white focus:text-blue-900"
+              value={localConfig.statsTeachers || ''}
+              onChange={e => setLocalConfig({ ...localConfig, statsTeachers: e.target.value })}
+              placeholder="VD: 50+"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Khóa học</label>
+            <input
+              className="w-full p-4 bg-white/10 hover:bg-white/20 focus:bg-white border-2 border-transparent focus:border-blue-300 rounded-2xl outline-none transition font-black text-xl text-white focus:text-blue-900"
+              value={localConfig.statsCourses || ''}
+              onChange={e => setLocalConfig({ ...localConfig, statsCourses: e.target.value })}
+              placeholder="VD: 20+"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Hài lòng (%)</label>
+            <input
+              className="w-full p-4 bg-white/10 hover:bg-white/20 focus:bg-white border-2 border-transparent focus:border-blue-300 rounded-2xl outline-none transition font-black text-xl text-white focus:text-blue-900"
+              value={localConfig.statsSatisfaction || ''}
+              onChange={e => setLocalConfig({ ...localConfig, statsSatisfaction: e.target.value })}
+              placeholder="VD: 98%"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1303,7 +1356,6 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
             </div>
           </div>
         </div>
-
         <div className="p-10 bg-slate-50 border-t flex justify-end gap-5">
           <button
             onClick={onClose}
@@ -1316,6 +1368,173 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
             className="px-16 py-4 bg-indigo-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition transform active:scale-95 flex items-center gap-3"
           >
             <Save size={18} /> {teacher ? 'Cập nhật ngay' : 'Thêm giảng viên'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AchievementsManager = () => {
+  const { state, updateState } = useApp();
+  const [editingAchievement, setEditingAchievement] = useState<Achievement | null | 'new'>(null);
+
+  const handleDelete = (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xoá thành tích này?')) return;
+    updateState({
+      achievements: (state.achievements || []).filter(a => a.id !== id)
+    });
+    toast.success('Đã xoá thành tích');
+  };
+
+  const handleSave = (data: Achievement) => {
+    const list = state.achievements || [];
+    const exists = list.find(a => a.id === data.id);
+    if (exists) {
+      updateState({
+        achievements: list.map(a => a.id === data.id ? data : a)
+      });
+    } else {
+      updateState({
+        achievements: [...list, data]
+      });
+    }
+    setEditingAchievement(null);
+  };
+
+  const sortedAchievements = [...(state.achievements || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-center bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+        <div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Thành tích nổi bật</h2>
+          <p className="text-slate-500 font-medium mt-1">Quản lý các giải thưởng, chứng nhận của trung tâm</p>
+        </div>
+        <button
+          onClick={() => setEditingAchievement('new')}
+          className="flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95"
+        >
+          <Trophy size={20} /> Thêm thành tích
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedAchievements.map(a => (
+          <div key={a.id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-xl transition-all duration-500 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+              <button
+                onClick={() => setEditingAchievement(a)}
+                className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-colors"
+              >
+                <Edit3 size={16} />
+              </button>
+              <button
+                onClick={() => handleDelete(a.id)}
+                className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-colors"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            <div className="flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black text-xl">
+                  {a.year}
+                </div>
+                <div className="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Thứ tự: {a.order || 0}
+                </div>
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-3 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{a.title}</h3>
+              <p className="text-slate-500 font-medium text-sm leading-relaxed line-clamp-3">{a.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editingAchievement && (
+        <AchievementModal
+          achievement={editingAchievement === 'new' ? null : editingAchievement}
+          onClose={() => setEditingAchievement(null)}
+          onSave={handleSave}
+        />
+      )}
+    </div>
+  );
+};
+
+const AchievementModal = ({ achievement, onClose, onSave }: { achievement: Achievement | null, onClose: () => void, onSave: (data: Achievement) => void }) => {
+  const [formData, setFormData] = useState<Achievement>(achievement || {
+    id: Date.now().toString(),
+    year: new Date().getFullYear().toString(),
+    title: '',
+    description: '',
+    order: 0
+  });
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+          <h3 className="text-2xl font-black text-slate-900">{achievement ? 'Chỉnh sửa' : 'Thêm'} thành tích</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition"><X size={20} /></button>
+        </div>
+
+        <div className="p-8 space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Năm</label>
+              <input
+                className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition font-black text-slate-900"
+                value={formData.year}
+                onChange={e => setFormData({ ...formData, year: e.target.value })}
+                placeholder="VD: 2023"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thứ tự ưu tiên</label>
+              <input
+                type="number"
+                className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition font-black text-slate-900"
+                value={formData.order || 0}
+                onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tiêu đề thành tích</label>
+            <input
+              className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition font-black text-slate-900"
+              value={formData.title}
+              onChange={e => setFormData({ ...formData, title: e.target.value })}
+              placeholder="VD: Trung Tâm Xuất Sắc"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chi tiết /Mô tả</label>
+            <textarea
+              className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition font-medium text-slate-600 resize-none"
+              rows={4}
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Nhập chi tiết về thành tích..."
+            />
+          </div>
+
+          <button
+            onClick={() => {
+              if (!formData.title || !formData.year) {
+                toast.error('Vui lòng nhập đầy đủ Tiêu đề và Năm');
+                return;
+              }
+              onSave(formData);
+            }}
+            className="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
+          >
+            <Save size={20} /> {achievement ? 'Cập nhật ngay' : 'Thêm ngay'}
           </button>
         </div>
       </div>

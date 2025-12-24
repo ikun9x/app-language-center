@@ -148,10 +148,10 @@ const HomePage: React.FC = () => {
       <section className="relative z-40 -mt-20 md:-mt-24 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: 'NĂM KINH NGHIỆM', value: '10+', color: 'bg-rose-50', iconColor: 'bg-rose-500', icon: <BookOpen className="text-white" size={20} />, textColor: 'text-rose-600' },
-            { label: 'GIẢNG VIÊN GIỎI', value: '50+', color: 'bg-indigo-50', iconColor: 'bg-indigo-500', icon: <Users className="text-white" size={20} />, textColor: 'text-indigo-600' },
-            { label: 'KHÓA HỌC', value: '20+', color: 'bg-cyan-50', iconColor: 'bg-cyan-500', icon: <GraduationCap className="text-white" size={20} />, textColor: 'text-cyan-600' },
-            { label: 'HÀI LÒNG', value: '98%', color: 'bg-amber-50', iconColor: 'bg-amber-500', icon: <Trophy className="text-white" size={20} />, textColor: 'text-amber-600' },
+            { label: 'NĂM KINH NGHIỆM', value: state.config.statsYears || '10+', color: 'bg-rose-50', iconColor: 'bg-rose-500', icon: <BookOpen className="text-white" size={20} />, textColor: 'text-rose-600' },
+            { label: 'GIẢNG VIÊN GIỎI', value: state.config.statsTeachers || '50+', color: 'bg-indigo-50', iconColor: 'bg-indigo-500', icon: <Users className="text-white" size={20} />, textColor: 'text-indigo-600' },
+            { label: 'KHÓA HỌC', value: state.config.statsCourses || '20+', color: 'bg-cyan-50', iconColor: 'bg-cyan-500', icon: <GraduationCap className="text-white" size={20} />, textColor: 'text-cyan-600' },
+            { label: 'HÀI LÒNG', value: state.config.statsSatisfaction || '98%', color: 'bg-amber-50', iconColor: 'bg-amber-500', icon: <Trophy className="text-white" size={20} />, textColor: 'text-amber-600' },
           ].map((stat, i) => (
             <div key={i} className={`${stat.color} p-5 rounded-[2rem] shadow-lg shadow-slate-200/50 flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1 transition-all duration-300 border border-white/80`}>
               <div className={`${stat.iconColor} w-12 h-12 rounded-full flex items-center justify-center shadow-md`}>
@@ -197,7 +197,7 @@ const HomePage: React.FC = () => {
               </div>
               <h3 className="text-3xl font-black mb-8 leading-tight">Thành Tích <br />Nổi Bật</h3>
               <ul className="space-y-6">
-                {state.achievements.map((a, i) => (
+                {[...(state.achievements || [])].sort((a, b) => (a.order || 0) - (b.order || 0)).map((a, i) => (
                   <li key={i} className="flex gap-4 group">
                     <span className="font-black text-blue-200 text-lg">{a.year}</span>
                     <div>
