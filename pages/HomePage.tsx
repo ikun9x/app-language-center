@@ -291,26 +291,6 @@ const HomePage: React.FC = () => {
             <div className="w-24 h-2 bg-blue-600 mx-auto mt-6 rounded-full"></div>
           </div>
 
-          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative w-full md:w-96 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
-              <input
-                type="text"
-                placeholder="Tìm kiếm văn bản..."
-                className="w-full bg-white border-2 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-slate-900 font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
-                value={docSearchQuery}
-                onChange={(e) => {
-                  setDocSearchQuery(e.target.value);
-                  setDocCurrentPage(1); // Reset to first page
-                }}
-              />
-            </div>
-            {state.publicDocuments && state.publicDocuments.length > docsPerPage && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-slate-400 mr-2 uppercase tracking-widest">Trang {docCurrentPage}</span>
-              </div>
-            )}
-          </div>
 
           <div className="bg-white rounded-[3rem] shadow-2xl shadow-blue-900/10 border border-slate-100 overflow-hidden">
             {/* Desktop Table: Hidden on Mobile */}
@@ -318,10 +298,26 @@ const HomePage: React.FC = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/80 border-b border-slate-100">
-                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest">Thông tin văn bản</th>
-                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Định dạng</th>
-                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Ngày ban hành</th>
-                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Tùy chọn</th>
+                    <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest w-2/3">
+                      <div className="flex items-center justify-between gap-4">
+                        <span>Thông tin văn bản</span>
+                        <div className="relative w-64 group font-sans">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={14} />
+                          <input
+                            type="text"
+                            placeholder="Tìm nhanh..."
+                            className="w-full bg-white/50 border border-slate-200 rounded-xl py-2 pl-10 pr-4 text-xs font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 outline-none transition-all"
+                            value={docSearchQuery}
+                            onChange={(e) => {
+                              setDocSearchQuery(e.target.value);
+                              setDocCurrentPage(1);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </th>
+                    <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Ngày ban hành</th>
+                    <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Tùy chọn</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -334,50 +330,42 @@ const HomePage: React.FC = () => {
 
                     if (paginated.length > 0) {
                       return paginated.map(doc => (
-                        <tr key={doc.id} className="group hover:bg-blue-50/30 transition-all duration-300">
-                          <td className="px-10 py-8">
-                            <div className="flex items-start gap-6">
-                              <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
-                                <FileText size={28} />
+                        <tr key={doc.id} className="group hover:bg-blue-50/40 transition-all duration-300">
+                          <td className="px-8 py-6">
+                            <div className="flex items-center gap-5">
+                              <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0">
+                                <FileText size={20} />
                               </div>
-                              <div className="flex flex-col">
-                                <span className="font-black text-slate-900 text-2xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-bold text-slate-900 text-lg tracking-tight leading-tight group-hover:text-blue-600 transition-colors truncate">
                                   {doc.label || doc.name}
                                 </span>
-                                {doc.description && (
-                                  <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed max-w-xl">
-                                    {doc.description}
-                                  </p>
-                                )}
-                                <div className="flex items-center gap-3 mt-3">
-                                  <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded italic">
-                                    Mã tệp: {doc.name}
+                                <div className="flex items-center gap-3 mt-1 underline-offset-4">
+                                  <span className="text-[10px] font-bold text-slate-400 font-mono italic">
+                                    #{doc.name.split('_')[0]}
                                   </span>
                                   <span className="text-[10px] font-bold text-blue-500 flex items-center gap-1">
                                     <Globe size={10} /> Công khai
+                                  </span>
+                                  <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded uppercase">
+                                    {doc.type}
                                   </span>
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-10 py-8 text-center">
-                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-black uppercase tracking-wider">
-                              <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-                              {doc.type}
-                            </span>
+                          <td className="px-8 py-6 text-center">
+                            <span className="text-slate-500 font-bold text-sm">{doc.uploadDate}</span>
                           </td>
-                          <td className="px-10 py-8 text-center">
-                            <span className="text-slate-500 font-bold">{doc.uploadDate}</span>
-                          </td>
-                          <td className="px-10 py-8 text-right">
+                          <td className="px-8 py-6 text-right">
                             <a
                               href={getAssetPath(doc.url)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 group-hover:shadow-blue-500/20"
+                              className="inline-flex items-center gap-2 bg-white border-2 border-slate-900 text-slate-900 px-5 py-2.5 rounded-xl font-black text-xs hover:bg-slate-900 hover:text-white transition-all shadow-sm hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
                             >
-                              <ExternalLink size={18} />
-                              <span>Xem văn bản</span>
+                              <ExternalLink size={14} />
+                              <span>XEM NGAY</span>
                             </a>
                           </td>
                         </tr>
@@ -385,10 +373,10 @@ const HomePage: React.FC = () => {
                     }
                     return (
                       <tr>
-                        <td colSpan={4} className="px-10 py-32 text-center text-slate-400 font-bold">
+                        <td colSpan={3} className="px-8 py-20 text-center text-slate-400 font-bold">
                           <div className="flex flex-col items-center gap-4 opacity-20">
-                            <FileText size={64} />
-                            <p className="text-2xl">Không tìm thấy văn bản phù hợp</p>
+                            <FileText size={48} />
+                            <p className="text-xl">Không tìm thấy tài liệu</p>
                           </div>
                         </td>
                       </tr>
@@ -409,29 +397,23 @@ const HomePage: React.FC = () => {
 
                 if (paginated.length > 0) {
                   return paginated.map(doc => (
-                    <div key={doc.id} className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100 space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-200">
-                          <FileText size={20} />
+                    <div key={doc.id} className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                          <FileText size={18} />
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <h4 className="font-black text-slate-900 truncate tracking-tight">{doc.label || doc.name}</h4>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{doc.uploadDate} | {doc.type}</span>
+                          <h4 className="font-bold text-slate-900 truncate text-sm">{doc.label || doc.name}</h4>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{doc.uploadDate} • {doc.type}</span>
                         </div>
                       </div>
-                      {doc.description && (
-                        <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-2">
-                          {doc.description}
-                        </p>
-                      )}
                       <a
                         href={getAssetPath(doc.url)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-slate-900 text-white w-full py-4 rounded-2xl font-black text-sm shadow-xl"
+                        className="bg-slate-900 text-white p-2.5 rounded-lg shadow-lg flex-shrink-0 hover:bg-blue-600 transition-colors"
                       >
-                        <ExternalLink size={16} />
-                        <span>Xem văn bản</span>
+                        <ExternalLink size={14} />
                       </a>
                     </div>
                   ));
