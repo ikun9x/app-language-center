@@ -76,6 +76,10 @@ export interface SiteConfig {
   brandNameSub: string;
   brandShortName: string;
   brandLogoImage?: string;
+  // Social Links
+  facebook?: string;
+  youtube?: string;
+  messenger?: string;
   // Dynamic Stats
   statsYears?: string;
   statsTeachers?: string;

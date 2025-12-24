@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
+import FloatingToolbar from './components/FloatingToolbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -174,6 +175,7 @@ const App: React.FC = () => {
               element={state.isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />}
             />
           </Routes>
+          <FloatingToolbar />
         </div>
       </HashRouter>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" />

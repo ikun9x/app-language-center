@@ -437,6 +437,20 @@ const ContentManager: React.FC = () => {
               <label className="block text-xs font-bold text-slate-500 mb-2">Email</label>
               <input className="w-full p-4 bg-slate-50 rounded-xl outline-none" value={localConfig.email} onChange={e => setLocalConfig({ ...localConfig, email: e.target.value })} />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Facebook URL</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-xs" value={localConfig.facebook || ''} onChange={e => setLocalConfig({ ...localConfig, facebook: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">YouTube URL</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-xs" value={localConfig.youtube || ''} onChange={e => setLocalConfig({ ...localConfig, youtube: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">Messenger Link</label>
+                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-xs" value={localConfig.messenger || ''} onChange={e => setLocalConfig({ ...localConfig, messenger: e.target.value })} placeholder="https://m.me/username" />
+              </div>
+            </div>
           </div>
         </div>
 

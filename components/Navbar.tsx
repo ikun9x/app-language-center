@@ -60,12 +60,6 @@ const Navbar: React.FC = () => {
             <LogIn size={18} className="group-hover:rotate-12 transition-transform" />
             <span className="text-sm font-semibold">Admin</span>
           </Link>
-          <a href={`tel:${state.config.phone}`} className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:-translate-y-1 active:scale-95 text-sm md:text-base">
-            {state.config.phone}
-          </a>
-          <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 hidden md:flex border border-slate-100">
-            <img src="/images/zalo.png" className="w-7 h-7 object-contain" alt="Zalo" />
-          </a>
         </div>
 
         {/* Mobile Toggle */}
@@ -84,15 +78,6 @@ const Navbar: React.FC = () => {
           ))}
           <div className="pt-4 border-t flex flex-col space-y-3">
             <Link to="/login" className="text-slate-500 font-medium px-2">Admin Login</Link>
-            <div className="grid grid-cols-2 gap-3">
-              <a href={`tel:${state.config.phone}`} className="text-center bg-orange-500 text-white py-3 rounded-xl font-bold text-sm shadow-md">
-                Gọi ngay
-              </a>
-              <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="flex items-center justify-center bg-white border border-slate-100 py-3 rounded-xl shadow-md">
-                <img src="/images/zalo.png" className="w-6 h-6 object-contain" alt="Zalo" />
-                <span className="ml-2 font-bold text-slate-700 text-sm">Zalo</span>
-              </a>
-            </div>
           </div>
         </div>
       )}
