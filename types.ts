@@ -53,6 +53,7 @@ export interface SiteConfig {
   seoTitle: string;
   seoDescription: string;
   seoKeywords: string;
+  establishmentDecision: string;
   businessLicense: string;
   representative: string;
   foundingDate: string;
