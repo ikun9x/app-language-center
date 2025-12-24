@@ -24,15 +24,24 @@ if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !pr
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
+console.log(">>> [INIT] Checking MONGODB_URI...");
 if (MONGODB_URI) {
-    mongoose.connect(MONGODB_URI)
+    console.log(">>> [INIT] MONGODB_URI found! Attempting connection...");
+    mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 10000
+    })
         .then(() => {
-            console.log(">>> Connected to MongoDB Atlas");
+            console.log(">>> [INIT] SUCCESS: Connected to MongoDB Atlas");
             migrateDataIfNeeded();
         })
-        .catch(err => console.error(">>> MongoDB Connection Error:", err));
+        .catch(err => {
+            console.error(">>> [INIT] ERROR: MongoDB Connection Failed:", err.message);
+            console.error(">>> [INIT] Full error:", err);
+        });
 } else {
-    console.warn(">>> WARNING: MONGODB_URI missing. Falling back to db.json.");
+    console.error(">>> [INIT] CRITICAL WARNING: MONGODB_URI is MISSING from environment variables!");
+    console.warn(">>> [INIT] Falling back to ephemeral db.json. DATA WILL BE LOST ON RESTART.");
 }
 
 // --- MongoDB Schema ---
@@ -137,7 +146,19 @@ app.get('/api/data', async (req, res) => {
 
     // 2. Fallback to local db.json
     const data = readDB();
+    console.log(">>> [GET] Served data from db.json (Fallback)");
     res.json({ ...data, _storage: 'file' });
+});
+
+app.get('/api/status', (req, res) => {
+    res.json({
+        mongodb_uri_exists: !!process.env.MONGODB_URI,
+        mongodb_connection_state: mongoose.connection.readyState,
+        mongodb_state_desc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState],
+        cloudinary_configured: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY),
+        server_uptime: process.uptime(),
+        env: process.env.NODE_ENV || 'development'
+    });
 });
 
 app.post('/api/data', async (req, res) => {
