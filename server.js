@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();
@@ -19,6 +20,48 @@ cloudinary.config({
 
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
     console.warn(">>> WARNING: Cloudinary credentials missing. File uploads will not work.");
+}
+
+// --- MongoDB Connection ---
+const MONGODB_URI = process.env.MONGODB_URI;
+if (MONGODB_URI) {
+    mongoose.connect(MONGODB_URI)
+        .then(() => {
+            console.log(">>> Connected to MongoDB Atlas");
+            migrateDataIfNeeded();
+        })
+        .catch(err => console.error(">>> MongoDB Connection Error:", err));
+} else {
+    console.warn(">>> WARNING: MONGODB_URI missing. Falling back to db.json.");
+}
+
+// --- MongoDB Schema ---
+const DataSchema = new mongoose.Schema({
+    id: { type: String, default: 'app_state' },
+    config: Object,
+    courses: Array,
+    teachers: Array,
+    achievements: Array,
+    messages: Array,
+    categories: Array,
+    publicDocuments: Array
+}, { timestamps: true });
+
+const DataModel = mongoose.model('Data', DataSchema);
+
+// Migration Helper
+async function migrateDataIfNeeded() {
+    try {
+        const count = await DataModel.countDocuments();
+        if (count === 0 && fs.existsSync(DB_FILE)) {
+            console.log(">>> Seeding MongoDB with data from db.json...");
+            const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+            await DataModel.create({ ...localData, id: 'app_state' });
+            console.log(">>> Migration Successful!");
+        }
+    } catch (err) {
+        console.error(">>> Migration Error:", err);
+    }
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -78,15 +121,38 @@ const writeDB = (data) => {
 };
 
 // Endpoints
-app.get('/api/data', (req, res) => {
+app.get('/api/data', async (req, res) => {
+    if (mongoose.connection.readyState === 1) {
+        try {
+            const data = await DataModel.findOne({ id: 'app_state' });
+            return res.json(data);
+        } catch (err) {
+            console.error('Error reading MongoDB:', err);
+        }
+    }
+    // Fallback
     const data = readDB();
     res.json(data);
 });
 
-app.post('/api/data', (req, res) => {
+app.post('/api/data', async (req, res) => {
+    if (mongoose.connection.readyState === 1) {
+        try {
+            await DataModel.findOneAndUpdate(
+                { id: 'app_state' },
+                { $set: req.body },
+                { upsert: true, new: true }
+            );
+            return res.json({ success: true, storage: 'mongodb' });
+        } catch (err) {
+            console.error('Error writing MongoDB:', err);
+        }
+    }
+
+    // Fallback to local
     const success = writeDB(req.body);
     if (success) {
-        res.json({ success: true });
+        res.json({ success: true, storage: 'local' });
     } else {
         res.status(500).json({ error: 'Failed to write data' });
     }

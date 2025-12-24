@@ -8,7 +8,7 @@ const isLocalDev = typeof window !== 'undefined' && (window.location.hostname ==
 
 // IMPORTANT: Replace this with your actual Render/Production Backend URL
 // Example: 'https://binhminh-backend.onrender.com'
-const PRODUCTION_API_URL = '';
+const PRODUCTION_API_URL = 'https://ngoaingubinhminh.onrender.com';
 
 export const API_BASE_URL = isLocalDev ? 'http://localhost:5001' : PRODUCTION_API_URL;
 

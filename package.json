@@ -14,17 +14,18 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
     "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "lucide-react": "^0.562.0",
+    "mongoose": "^9.0.2",
     "multer": "^2.0.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.11.0",
     "react-toastify": "^11.0.5",
-    "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   },
