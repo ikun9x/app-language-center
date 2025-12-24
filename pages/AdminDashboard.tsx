@@ -26,7 +26,9 @@ import {
   Link as LinkIcon,
   Mail,
   Phone,
-  Send
+  Send,
+  FileText,
+  ExternalLink
 } from 'lucide-react';
 const UPLOAD_BASE_URL = 'http://localhost:5001/uploads/';
 
@@ -82,6 +84,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin/content" icon={<Edit3 size={20} />} label="Quản trị giao diện" active={location.pathname === '/admin/content'} />
           <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} />
           <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} />
+          <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} />
           <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} />
           <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} />
           <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} />
@@ -106,6 +109,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="leads" element={<LeadsManager />} />
           <Route path="seo" element={<SeoManager />} />
           <Route path="teachers" element={<TeachersManager />} />
+          <Route path="documents" element={<DocumentsManager />} />
           <Route path="compliance" element={<ComplianceManager />} />
         </Routes>
       </main>
