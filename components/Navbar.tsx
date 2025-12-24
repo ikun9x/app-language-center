@@ -60,8 +60,11 @@ const Navbar: React.FC = () => {
             <LogIn size={18} className="group-hover:rotate-12 transition-transform" />
             <span className="text-sm font-semibold">Admin</span>
           </Link>
-          <a href={`tel:${state.config.phone}`} className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:-translate-y-1 active:scale-95">
+          <a href={`tel:${state.config.phone}`} className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition transform hover:-translate-y-1 active:scale-95 text-sm md:text-base">
             {state.config.phone}
+          </a>
+          <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="bg-[#0068ff] text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 hidden md:block text-sm md:text-base">
+            Zalo
           </a>
         </div>
 
@@ -79,11 +82,16 @@ const Navbar: React.FC = () => {
               {link.name}
             </button>
           ))}
-          <div className="pt-4 border-t flex flex-col space-y-4">
-            <Link to="/login" className="text-slate-500">Admin Login</Link>
-            <a href={`tel:${state.config.phone}`} className="w-full text-center bg-blue-600 text-white py-3 rounded-lg font-bold">
-              Gọi ngay: {state.config.phone}
-            </a>
+          <div className="pt-4 border-t flex flex-col space-y-3">
+            <Link to="/login" className="text-slate-500 font-medium px-2">Admin Login</Link>
+            <div className="grid grid-cols-2 gap-3">
+              <a href={`tel:${state.config.phone}`} className="text-center bg-orange-500 text-white py-3 rounded-xl font-bold text-sm shadow-md">
+                Gọi ngay
+              </a>
+              <a href={`https://zalo.me/${state.config.zalo || state.config.phone}`} target="_blank" rel="noreferrer" className="text-center bg-[#0068ff] text-white py-3 rounded-xl font-bold text-sm shadow-md">
+                Zalo
+              </a>
+            </div>
           </div>
         </div>
       )}

@@ -277,21 +277,40 @@ const HomePage: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.name}</h3>
                 <p className="text-blue-600 text-sm font-black mb-4 uppercase tracking-widest">{t.role}</p>
-                <div className="flex flex-col items-center gap-1 mb-4">
+                <div className="flex flex-col items-center gap-3 mb-6">
                   {t.showPhone && t.phone && (
-                    <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">
-                      <div className="w-5 h-5 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
-                        <PhoneIcon size={10} />
+                    <div className="flex items-center gap-3 group/phone">
+                      <div className="flex gap-1.5">
+                        <a
+                          href={`tel:${t.phone}`}
+                          title="Gọi điện"
+                          className="w-10 h-10 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm border border-orange-100"
+                        >
+                          <PhoneIcon size={18} />
+                        </a>
+                        <a
+                          href={`https://zalo.me/${t.zalo || t.phone}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Chat Zalo"
+                          className="w-10 h-10 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
+                        >
+                          <span className="text-[10px] font-black">Zalo</span>
+                        </a>
                       </div>
-                      {t.phone}
+                      <span className="text-slate-700 text-lg font-bold tracking-tight">{t.phone}</span>
                     </div>
                   )}
                   {t.showEmail && t.email && (
-                    <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">
-                      <div className="w-5 h-5 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
-                        <Mail size={10} />
-                      </div>
-                      {t.email}
+                    <div className="flex items-center gap-3 group/email">
+                      <a
+                        href={`mailto:${t.email}`}
+                        title="Gửi Email"
+                        className="w-10 h-10 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-100"
+                      >
+                        <Mail size={18} />
+                      </a>
+                      <span className="text-slate-700 text-lg font-bold tracking-tight truncate max-w-[200px]">{t.email}</span>
                     </div>
                   )}
                 </div>
