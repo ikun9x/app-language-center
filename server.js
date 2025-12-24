@@ -107,29 +107,20 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const originalName = req.file.originalname;
-    const nameWithoutExt = path.parse(originalName).name;
-
-    // Sanitize filename
-    const sanitizedName = nameWithoutExt
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]/gi, '_')
-        .toLowerCase()
-        .slice(0, 50);
-
-    // IMPORTANT: For 'raw' resource type, including the extension in public_id 
-    // helps browsers and Cloudinary identify the file type.
-    const publicId = `${sanitizedName}_${Date.now()}.pdf`;
-
+    console.log('Starting PDF upload to Cloudinary...');
     const stream = cloudinary.uploader.upload_stream(
         {
-            folder: 'binhminh_pdfs',
-            resource_type: 'raw',
-            public_id: publicId
+            folder: 'binhminh_documents',
+            resource_type: 'auto',
+            type: 'upload',
+            access_mode: 'public'
         },
         (error, result) => {
-            if (error) return res.status(500).json({ error: error.message });
+            if (error) {
+                console.error('Cloudinary PDF Upload Error:', error);
+                return res.status(500).json({ error: error.message });
+            }
+            console.log('PDF Upload Success:', result.secure_url);
             res.json({ url: result.secure_url });
         }
     );
