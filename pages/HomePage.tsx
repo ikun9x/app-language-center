@@ -20,9 +20,10 @@ import {
   Sparkles,
   Zap,
   Circle,
-  FileText,
-  Globe,
-  ExternalLink,
+  Alphabet,
+  Search,
+  ChevronLeft,
+  ChevronRight,
   X
 } from 'lucide-react';
 
@@ -34,6 +35,9 @@ const HomePage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [docSearchQuery, setDocSearchQuery] = useState('');
+  const [docCurrentPage, setDocCurrentPage] = useState(1);
+  const docsPerPage = 5;
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,8 +289,30 @@ const HomePage: React.FC = () => {
             <div className="w-24 h-2 bg-blue-600 mx-auto mt-6 rounded-full"></div>
           </div>
 
+          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="relative w-full md:w-96 group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+              <input
+                type="text"
+                placeholder="Tìm kiếm văn bản..."
+                className="w-full bg-white border-2 border-slate-100 rounded-2xl py-4 pl-14 pr-6 text-slate-900 font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
+                value={docSearchQuery}
+                onChange={(e) => {
+                  setDocSearchQuery(e.target.value);
+                  setDocCurrentPage(1); // Reset to first page
+                }}
+              />
+            </div>
+            {state.publicDocuments && state.publicDocuments.length > docsPerPage && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-slate-400 mr-2 uppercase tracking-widest">Trang {docCurrentPage}</span>
+              </div>
+            )}
+          </div>
+
           <div className="bg-white rounded-[3rem] shadow-2xl shadow-blue-900/10 border border-slate-100 overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop Table: Hidden on Mobile */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/80 border-b border-slate-100">
@@ -297,70 +323,165 @@ const HomePage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {state.publicDocuments && state.publicDocuments.length > 0 ? (
-                    state.publicDocuments.map(doc => (
-                      <tr key={doc.id} className="group hover:bg-blue-50/30 transition-all duration-300">
-                        <td className="px-10 py-8">
-                          <div className="flex items-start gap-6">
-                            <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
-                              <FileText size={28} />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="font-black text-slate-900 text-2xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
-                                {doc.label || doc.name}
-                              </span>
-                              {doc.description && (
-                                <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed max-w-xl">
-                                  {doc.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-3 mt-3">
-                                <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded italic">
-                                  Mã tệp: {doc.name}
+                  {(() => {
+                    const filtered = (state.publicDocuments || []).filter(doc =>
+                      (doc.label || doc.name).toLowerCase().includes(docSearchQuery.toLowerCase())
+                    );
+                    const startIndex = (docCurrentPage - 1) * docsPerPage;
+                    const paginated = filtered.slice(startIndex, startIndex + docsPerPage);
+
+                    if (paginated.length > 0) {
+                      return paginated.map(doc => (
+                        <tr key={doc.id} className="group hover:bg-blue-50/30 transition-all duration-300">
+                          <td className="px-10 py-8">
+                            <div className="flex items-start gap-6">
+                              <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0 mt-1">
+                                <FileText size={28} />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-black text-slate-900 text-2xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+                                  {doc.label || doc.name}
                                 </span>
-                                <span className="text-[10px] font-bold text-blue-500 flex items-center gap-1">
-                                  <Globe size={10} /> Công khai
-                                </span>
+                                {doc.description && (
+                                  <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed max-w-xl">
+                                    {doc.description}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-3 mt-3">
+                                  <span className="text-[10px] font-bold text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded italic">
+                                    Mã tệp: {doc.name}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-blue-500 flex items-center gap-1">
+                                    <Globe size={10} /> Công khai
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                          </td>
+                          <td className="px-10 py-8 text-center">
+                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-black uppercase tracking-wider">
+                              <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                              {doc.type}
+                            </span>
+                          </td>
+                          <td className="px-10 py-8 text-center">
+                            <span className="text-slate-500 font-bold">{doc.uploadDate}</span>
+                          </td>
+                          <td className="px-10 py-8 text-right">
+                            <a
+                              href={getAssetPath(doc.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 group-hover:shadow-blue-500/20"
+                            >
+                              <ExternalLink size={18} />
+                              <span>Xem văn bản</span>
+                            </a>
+                          </td>
+                        </tr>
+                      ));
+                    }
+                    return (
+                      <tr>
+                        <td colSpan={4} className="px-10 py-32 text-center text-slate-400 font-bold">
+                          <div className="flex flex-col items-center gap-4 opacity-20">
+                            <FileText size={64} />
+                            <p className="text-2xl">Không tìm thấy văn bản phù hợp</p>
                           </div>
                         </td>
-                        <td className="px-10 py-8 text-center">
-                          <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-black uppercase tracking-wider">
-                            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-                            {doc.type}
-                          </span>
-                        </td>
-                        <td className="px-10 py-8 text-center">
-                          <span className="text-slate-500 font-bold">{doc.uploadDate}</span>
-                        </td>
-                        <td className="px-10 py-8 text-right">
-                          <a
-                            href={getAssetPath(doc.url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 group-hover:shadow-blue-500/20"
-                          >
-                            <ExternalLink size={18} />
-                            <span>Xem văn bản</span>
-                          </a>
-                        </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="px-10 py-32 text-center text-slate-400 font-bold">
-                        <div className="flex flex-col items-center gap-4 opacity-20">
-                          <FileText size={64} />
-                          <p className="text-2xl">Hiện chưa có văn bản niêm yết</p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                    );
+                  })()}
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Cards: Show on small screens */}
+            <div className="lg:hidden p-6 space-y-6">
+              {(() => {
+                const filtered = (state.publicDocuments || []).filter(doc =>
+                  (doc.label || doc.name).toLowerCase().includes(docSearchQuery.toLowerCase())
+                );
+                const startIndex = (docCurrentPage - 1) * docsPerPage;
+                const paginated = filtered.slice(startIndex, startIndex + docsPerPage);
+
+                if (paginated.length > 0) {
+                  return paginated.map(doc => (
+                    <div key={doc.id} className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100 space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-red-200">
+                          <FileText size={20} />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <h4 className="font-black text-slate-900 truncate tracking-tight">{doc.label || doc.name}</h4>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{doc.uploadDate} | {doc.type}</span>
+                        </div>
+                      </div>
+                      {doc.description && (
+                        <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-2">
+                          {doc.description}
+                        </p>
+                      )}
+                      <a
+                        href={getAssetPath(doc.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 bg-slate-900 text-white w-full py-4 rounded-2xl font-black text-sm shadow-xl"
+                      >
+                        <ExternalLink size={16} />
+                        <span>Xem văn bản</span>
+                      </a>
+                    </div>
+                  ));
+                }
+                return (
+                  <div className="py-20 text-center text-slate-400 font-bold opacity-20">
+                    <FileText size={48} className="mx-auto mb-4" />
+                    <p>Không thấy văn bản</p>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
+
+          {/* Pagination Controls */}
+          {(() => {
+            const filtered = (state.publicDocuments || []).filter(doc =>
+              (doc.label || doc.name).toLowerCase().includes(docSearchQuery.toLowerCase())
+            );
+            const totalPages = Math.ceil(filtered.length / docsPerPage);
+            if (totalPages <= 1) return null;
+
+            return (
+              <div className="flex items-center justify-center gap-4 mt-12">
+                <button
+                  onClick={() => setDocCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={docCurrentPage === 1}
+                  className="w-14 h-14 bg-white border-2 border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:hover:text-slate-400 disabled:hover:border-slate-100 transition-all shadow-lg"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <div className="flex items-center gap-2">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setDocCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-xl font-black text-xs transition-all ${docCurrentPage === i + 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setDocCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={docCurrentPage === totalPages}
+                  className="w-14 h-14 bg-white border-2 border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 disabled:opacity-30 disabled:hover:text-slate-400 disabled:hover:border-slate-100 transition-all shadow-lg"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -444,7 +565,7 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {showVideoModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
@@ -465,7 +586,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       )}
-    </main>
+    </main >
   );
 };
 
