@@ -30,7 +30,9 @@ import {
   FileText,
   ExternalLink,
   HardDrive,
-  Trophy
+  Trophy,
+  Menu,
+  X
 } from 'lucide-react';
 const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -53,9 +55,10 @@ const deletePhysicalFile = async (url?: string) => {
   }
 };
 
-const SidebarLink: React.FC<{ to: string, icon: React.ReactNode, label: string, active: boolean }> = ({ to, icon, label, active }) => (
+const SidebarLink: React.FC<{ to: string, icon: React.ReactNode, label: string, active: boolean, onClick?: () => void }> = ({ to, icon, label, active, onClick }) => (
   <Link
     to={to}
+    onClick={onClick}
     className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition font-medium ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'}`}
   >
     {icon} <span>{label}</span>
@@ -66,52 +69,90 @@ const AdminDashboard: React.FC = () => {
   const { state, updateState } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     updateState({ isAuthenticated: false });
     navigate('/');
   };
 
+  const closeSidebar = () => setIsSidebarOpen(false);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-slate-200 p-6 flex flex-col fixed h-full z-20">
-        <div className="flex items-center space-x-3 mb-10 px-2">
-          <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-2 rounded-lg font-bold text-white"}>
+    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center space-x-3">
+          <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-1.5 rounded-lg font-bold text-white text-sm"}>
             {state.config.brandLogoImage ? (
-              <img src={getAssetPath(state.config.brandLogoImage)} className="w-14 h-14 object-contain" alt="Logo" />
+              <img src={getAssetPath(state.config.brandLogoImage)} className="w-10 h-10 object-contain" alt="Logo" />
             ) : (
               state.config.brandShortName
             )}
           </div>
-          <span className="font-extrabold text-lg text-slate-900 tracking-tight">{state.config.brandNamePrincipal} Admin</span>
+          <span className="font-extrabold text-base text-slate-900 tracking-tight">{state.config.brandNamePrincipal}</span>
+        </div>
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 bg-slate-100 rounded-xl text-slate-600 hover:bg-blue-600 hover:text-white transition-colors"
+        >
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={closeSidebar}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        w-72 bg-white border-r border-slate-200 p-6 flex flex-col fixed h-full z-50 transition-transform duration-300 lg:translate-x-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="hidden lg:flex items-center space-x-3 mb-10 px-2 text-wrap">
+          <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-2 rounded-lg font-bold text-white text-xs"}>
+            {state.config.brandLogoImage ? (
+              <img src={getAssetPath(state.config.brandLogoImage)} className="w-10 h-10 object-contain" alt="Logo" />
+            ) : (
+              state.config.brandShortName
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-extrabold text-lg text-slate-900 tracking-tight leading-none mb-1">{state.config.brandNamePrincipal}</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Admin Panel</span>
+          </div>
         </div>
 
         <nav className="flex-1 space-y-2 overflow-y-auto pr-2">
-          <SidebarLink to="/admin" icon={<LayoutDashboard size={20} />} label="Tổng quan" active={location.pathname === '/admin'} />
-          <SidebarLink to="/admin/content" icon={<Edit3 size={20} />} label="Quản trị giao diện" active={location.pathname === '/admin/content'} />
-          <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} />
-          <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} />
-          <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} />
-          <SidebarLink to="/admin/system" icon={<HardDrive size={20} />} label="Tối ưu hệ thống" active={location.pathname === '/admin/system'} />
-          <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} />
-          <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} />
-          <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} />
-          <SidebarLink to="/admin/achievements" icon={<Trophy size={20} />} label="Thành tích" active={location.pathname === '/admin/achievements'} />
+          <SidebarLink to="/admin" icon={<LayoutDashboard size={20} />} label="Tổng quan" active={location.pathname === '/admin'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/content" icon={<Edit3 size={20} />} label="Quản trị giao diện" active={location.pathname === '/admin/content'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/achievements" icon={<Trophy size={20} />} label="Thành tích" active={location.pathname === '/admin/achievements'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/system" icon={<HardDrive size={20} />} label="Tối ưu hệ thống" active={location.pathname === '/admin/system'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} onClick={closeSidebar} />
         </nav>
 
-        <SidebarLink to="/" icon={<Home size={20} />} label="Trang chủ" active={false} />
-
-        <button
-          onClick={handleLogout}
-          className="mt-6 flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition font-bold"
-        >
-          <LogOut size={20} /> <span>Đăng xuất</span>
-        </button>
+        <div className="pt-4 mt-4 border-t border-slate-100 flex flex-col gap-2">
+          <SidebarLink to="/" icon={<Home size={20} />} label="Trang chủ" active={false} />
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition font-bold"
+          >
+            <LogOut size={20} /> <span>Đăng xuất</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-72 p-10">
+      <main className="flex-1 lg:ml-72 p-6 md:p-10 min-w-0">
         <Routes>
           <Route index element={<Overview state={state} />} />
           <Route path="content" element={<ContentManager />} />
@@ -137,7 +178,7 @@ const Overview: React.FC<{ state: any }> = ({ state }) => (
       <h2 className="text-3xl font-extrabold text-slate-900">Tổng quan hệ thống</h2>
       <p className="text-slate-500">Chào mừng trở lại, Admin.</p>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       <StatCard label="Khóa học" value={state.courses.length} color="blue" />
       <StatCard label="Giảng viên" value={state.teachers.length} color="indigo" />
       <StatCard label="Yêu cầu tư vấn" value={state.messages.length} color="orange" />
@@ -161,9 +202,9 @@ const Overview: React.FC<{ state: any }> = ({ state }) => (
 );
 
 const StatCard: React.FC<{ label: string, value: any, color: string }> = ({ label, value, color }) => (
-  <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-2">
-    <p className="text-slate-500 text-sm font-medium">{label}</p>
-    <p className={`text-4xl font-black text - ${color}-600`}>{value}</p>
+  <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 space-y-1 md:space-y-2">
+    <p className="text-slate-500 text-xs md:text-sm font-medium">{label}</p>
+    <p className={`text-2xl md:text-4xl font-black text-${color}-600`}>{value}</p>
   </div>
 );
 
@@ -228,26 +269,26 @@ const ContentManager: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-extrabold">Cập nhật giao diện</h2>
-        <button onClick={save} className="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2">
+    <div className="space-y-6 md:space-y-8 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900">Cập nhật giao diện</h2>
+        <button onClick={save} className="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
           <Save size={18} /> Lưu thay đổi
         </button>
       </div>
 
       {/* Dynamic Statistics Card */}
-      <div className="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl text-white">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-white/20 rounded-2xl">
+      <div className="bg-blue-600 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl text-white">
+        <div className="flex items-center gap-4 mb-6 md:mb-8">
+          <div className="p-3 bg-white/20 rounded-2xl hidden sm:block">
             <Trophy size={24} />
           </div>
           <div>
-            <h3 className="text-2xl font-black tracking-tight">Chỉ số thống kê</h3>
-            <p className="text-blue-100 text-sm font-medium">Cập nhật các con số ấn tượng hiển thị trên trang chủ</p>
+            <h3 className="text-xl md:text-2xl font-black tracking-tight">Chỉ số thống kê</h3>
+            <p className="text-blue-100 text-xs md:text-sm font-medium">Cập nhật các con số ấn tượng trên trang chủ</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Năm kinh nghiệm</label>
             <input
@@ -287,7 +328,7 @@ const ContentManager: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6">
           <h3 className="font-bold text-lg border-b pb-4">Branding & Identity</h3>
           <div className="space-y-4">
