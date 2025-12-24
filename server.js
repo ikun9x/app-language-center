@@ -109,8 +109,16 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
 
     const originalName = req.file.originalname;
     const nameWithoutExt = path.parse(originalName).name;
-    const uniqueId = Date.now();
-    const publicId = `${nameWithoutExt}_${uniqueId}`;
+
+    // Sanitize filename: remove accents, replace non-alphanumeric with underscores
+    const sanitizedName = nameWithoutExt
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+        .slice(0, 50);
+
+    const publicId = `${sanitizedName}_${Date.now()}`;
 
     const stream = cloudinary.uploader.upload_stream(
         {
@@ -118,13 +126,16 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
             resource_type: 'image',
             access_mode: 'public',
             public_id: publicId,
-            format: 'pdf',
-            use_filename: true,
-            unique_filename: true
+            format: 'pdf'
         },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
-            res.json({ url: result.secure_url });
+            // Explicitly ensure the URL ends in .pdf for browser recognition
+            let finalUrl = result.secure_url;
+            if (!finalUrl.toLowerCase().endsWith('.pdf')) {
+                finalUrl += '.pdf';
+            }
+            res.json({ url: finalUrl });
         }
     );
     stream.end(req.file.buffer);
