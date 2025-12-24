@@ -32,6 +32,7 @@ import {
   HardDrive,
   Trophy,
   Menu,
+  Star,
   X
 } from 'lucide-react';
 const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -133,6 +134,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} onClick={closeSidebar} />
           <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} onClick={closeSidebar} />
           <SidebarLink to="/admin/achievements" icon={<Trophy size={20} />} label="Thành tích" active={location.pathname === '/admin/achievements'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/testimonials" icon={<MessageSquare size={20} />} label="Đánh giá khách hàng" active={location.pathname === '/admin/testimonials'} onClick={closeSidebar} />
           <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} onClick={closeSidebar} />
           <SidebarLink to="/admin/system" icon={<HardDrive size={20} />} label="Tối ưu hệ thống" active={location.pathname === '/admin/system'} onClick={closeSidebar} />
           <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} onClick={closeSidebar} />
@@ -161,6 +163,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="seo" element={<SeoManager />} />
           <Route path="teachers" element={<TeachersManager />} />
           <Route path="achievements" element={<AchievementsManager />} />
+          <Route path="testimonials" element={<TestimonialsManager />} />
           <Route path="documents" element={<DocumentsManager />} />
           <Route path="system" element={<SystemOptimizer />} />
           <Route path="compliance" element={<ComplianceManager />} />
@@ -1631,6 +1634,253 @@ const AchievementModal = ({ achievement, onClose, onSave }: { achievement: Achie
     </div>
   );
 };
+const TestimonialsManager: React.FC = () => {
+  const { state, updateState } = useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+
+  const handleDelete = async (testimonial: Testimonial) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
+      await deletePhysicalFile(testimonial.image);
+      const newTestimonials = (state.testimonials || []).filter(t => t.id !== testimonial.id);
+      updateState({ testimonials: newTestimonials });
+      toast.success('Đã xóa đánh giá!');
+    }
+  };
+
+  const handleSave = (testimonialData: Testimonial) => {
+    let newTestimonials;
+    const list = state.testimonials || [];
+    if (editingTestimonial?.id) {
+      newTestimonials = list.map(t => t.id === editingTestimonial.id ? { ...testimonialData, id: t.id } : t);
+    } else {
+      const newTestimonial = { ...testimonialData, id: Date.now().toString() };
+      newTestimonials = [...list, newTestimonial];
+    }
+    updateState({ testimonials: newTestimonials });
+    setShowModal(false);
+    setEditingTestimonial(null);
+    toast.success(editingTestimonial ? 'Cập nhật đánh giá thành công!' : 'Đã thêm đánh giá mới!');
+  };
+
+  const sortedTestimonials = [...(state.testimonials || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-center bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+        <div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Đánh giá khách hàng</h2>
+          <p className="text-slate-500 font-medium mt-1">Quản lý nhận xét từ phụ huynh và học sinh</p>
+        </div>
+        <button
+          onClick={() => { setEditingTestimonial(null); setShowModal(true); }}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition transform active:scale-95 flex items-center gap-2"
+        >
+          <PlusCircle size={20} /> Thêm đánh giá
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {sortedTestimonials.map((t: Testimonial) => (
+          <div key={t.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+              <button
+                onClick={() => { setEditingTestimonial(t); setShowModal(true); }}
+                className="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors"
+              >
+                <Edit3 size={16} />
+              </button>
+              <button
+                onClick={() => handleDelete(t)}
+                className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-colors"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            <div className="flex gap-6 items-start">
+              <div className="w-20 h-20 rounded-2xl bg-slate-50 overflow-hidden border-2 border-slate-100 shrink-0 shadow-inner">
+                {t.image ? (
+                  <img src={getAssetPath(t.image)} className="w-full h-full object-cover" alt={t.name} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
+                    <ImageIcon size={30} />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} className={i < t.rating ? "fill-amber-400 text-amber-400" : "text-slate-200"} />
+                  ))}
+                </div>
+                <h3 className="font-black text-xl text-slate-900 uppercase tracking-tight">{t.name}</h3>
+                <p className="text-xs font-black text-indigo-600 uppercase tracking-widest">{t.role}</p>
+              </div>
+            </div>
+
+            <p className="mt-6 text-slate-500 font-medium italic text-sm leading-relaxed line-clamp-4">
+              "{t.content}"
+            </p>
+
+            <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thứ tự hiển thị: {t.order || 0}</span>
+            </div>
+          </div>
+        ))}
+
+        {sortedTestimonials.length === 0 && (
+          <div className="col-span-full py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+              <MessageSquare size={40} />
+            </div>
+            <div>
+              <p className="text-slate-400 font-black text-xl">Chưa có đánh giá khách hàng nào</p>
+              <p className="text-slate-400 text-sm">Nhấn nút "Thêm đánh giá" để bắt đầu.</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {showModal && (
+        <TestimonialModal
+          testimonial={editingTestimonial}
+          onClose={() => { setShowModal(false); setEditingTestimonial(null); }}
+          onSave={handleSave}
+        />
+      )}
+    </div>
+  );
+};
+
+const TestimonialModal = ({ testimonial, onClose, onSave }: { testimonial: Testimonial | null, onClose: () => void, onSave: (data: Testimonial) => void }) => {
+  const [formData, setFormData] = useState<Testimonial>(testimonial || {
+    id: '',
+    name: '',
+    role: 'PHHS',
+    content: '',
+    rating: 5,
+    order: 0,
+    image: ''
+  });
+
+  const handleImageUpload = async (file: File) => {
+    const data = new FormData();
+    data.append('file', file);
+    try {
+      if (formData.image) await deletePhysicalFile(formData.image);
+      const res = await fetch(`${API_BASE_URL}/api/upload`, { method: 'POST', body: data });
+      const { url } = await res.json();
+      if (url) setFormData({ ...formData, image: url });
+    } catch (err) {
+      toast.error('Lỗi tải ảnh');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+          <h3 className="text-2xl font-black text-slate-900">{testimonial ? 'Chỉnh sửa' : 'Thêm'} đánh giá</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition"><X size={20} /></button>
+        </div>
+
+        <div className="p-8 space-y-6 overflow-y-auto max-h-[70vh]">
+          <div className="flex gap-8 items-start">
+            <div
+              className="w-32 h-32 rounded-[2rem] bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer overflow-hidden group shrink-0"
+              onClick={() => document.getElementById('testiImage')?.click()}
+            >
+              {formData.image ? (
+                <img src={getAssetPath(formData.image)} className="w-full h-full object-cover" alt="Preview" />
+              ) : (
+                <>
+                  <Upload size={24} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  <span className="text-[9px] font-black text-slate-300 uppercase mt-2 group-hover:text-indigo-500">Ảnh</span>
+                </>
+              )}
+              <input
+                id="testiImage"
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
+              />
+            </div>
+
+            <div className="flex-1 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tên khách hàng</label>
+                <input
+                  className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-indigo-600 rounded-2xl outline-none transition font-black text-slate-900"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="VD: Minh Hằng"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vai trò</label>
+                  <input
+                    className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-indigo-600 rounded-2xl outline-none transition font-black text-slate-900"
+                    value={formData.role}
+                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                    placeholder="VD: PHHS"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Xếp hạng (1-5)</label>
+                  <select
+                    className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-indigo-600 rounded-2xl outline-none transition font-black text-slate-900"
+                    value={formData.rating}
+                    onChange={e => setFormData({ ...formData, rating: parseInt(e.target.value) })}
+                  >
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Sao</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhận xét /Đánh giá</label>
+            <textarea
+              className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-600 rounded-2xl outline-none transition font-medium text-slate-600 resize-none"
+              rows={4}
+              value={formData.content}
+              onChange={e => setFormData({ ...formData, content: e.target.value })}
+              placeholder="Nhập nội dung đánh giá từ khách hàng..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thứ tự ưu tiên</label>
+            <input
+              type="number"
+              className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-indigo-600 rounded-2xl outline-none transition font-black text-slate-900"
+              value={formData.order || 0}
+              onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+            />
+          </div>
+
+          <button
+            onClick={() => {
+              if (!formData.name || !formData.content) {
+                toast.error('Vui lòng nhập đầy đủ Tên và Nội dung');
+                return;
+              }
+              onSave(formData);
+            }}
+            className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-lg shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
+          >
+            <Save size={20} /> {testimonial ? 'Cập nhật ngay' : 'Thêm ngay'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DocumentsManager = () => {
   const { state, updateState } = useApp();
   const [isUploading, setIsUploading] = useState(false);

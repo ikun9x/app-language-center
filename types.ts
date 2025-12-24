@@ -83,14 +83,24 @@ export interface SiteConfig {
   statsSatisfaction?: string;
 }
 
-export type AppState = {
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+  image?: string;
+  order?: number;
+}
+
+export interface AppState {
   config: SiteConfig;
   courses: Course[];
   teachers: Teacher[];
   achievements: Achievement[];
   messages: GuestMessage[];
   isAuthenticated: boolean;
-  lastLoginDay?: string;
   categories: string[];
   publicDocuments: PublicDocument[];
-};
+  testimonials: Testimonial[];
+}

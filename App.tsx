@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppState, GuestMessage } from './types';
-import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, AppContext, API_BASE_URL } from './constants';
+import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, INITIAL_TESTIMONIALS, AppContext, API_BASE_URL } from './constants';
 
 // --- Components ---
 import Navbar from './components/Navbar';
@@ -22,7 +22,8 @@ const App: React.FC = () => {
     messages: [],
     isAuthenticated: false,
     categories: INITIAL_CATEGORIES,
-    publicDocuments: INITIAL_DOCUMENTS
+    publicDocuments: INITIAL_DOCUMENTS,
+    testimonials: INITIAL_TESTIMONIALS
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           if (!data.achievements) data.achievements = INITIAL_ACHIEVEMENTS;
           if (!data.messages) data.messages = [];
           if (!data.publicDocuments) data.publicDocuments = INITIAL_DOCUMENTS; // Add publicDocuments fallback
+          if (!data.testimonials) data.testimonials = INITIAL_TESTIMONIALS;
 
           const adminCred = localStorage.getItem('bm_admin_cred');
           setState({ ...data, isAuthenticated: !!adminCred });
@@ -66,6 +68,9 @@ const App: React.FC = () => {
           if (!parsed.publicDocuments) {
             parsed.publicDocuments = INITIAL_DOCUMENTS;
           }
+          if (!parsed.testimonials) {
+            parsed.testimonials = INITIAL_TESTIMONIALS;
+          }
 
           setState({ ...parsed, isAuthenticated: !!adminCred });
         } else {
@@ -79,6 +84,7 @@ const App: React.FC = () => {
             achievements: INITIAL_ACHIEVEMENTS,
             messages: [],
             publicDocuments: INITIAL_DOCUMENTS,
+            testimonials: INITIAL_TESTIMONIALS,
             isAuthenticated: !!adminCred
           });
         }
@@ -102,7 +108,8 @@ const App: React.FC = () => {
         achievements: state.achievements,
         messages: state.messages,
         categories: state.categories,
-        publicDocuments: state.publicDocuments
+        publicDocuments: state.publicDocuments,
+        testimonials: state.testimonials
       }));
 
       try {

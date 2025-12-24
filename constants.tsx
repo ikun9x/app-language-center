@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext } from 'react';
-import { SiteConfig, Course, Teacher, Achievement, AppState, GuestMessage } from './types';
+import { SiteConfig, Course, Teacher, Achievement, AppState, GuestMessage, Testimonial, PublicDocument } from './types';
 
 // --- Context and Hook (Moved here to avoid circular dependencies) ---
 // --- Constants for Environment ---
@@ -150,3 +150,24 @@ export const INITIAL_CATEGORIES = [
 ];
 
 export const INITIAL_DOCUMENTS: PublicDocument[] = [];
+
+export const INITIAL_TESTIMONIALS: Testimonial[] = [
+  {
+    id: '1',
+    name: 'Minh Hằng',
+    role: 'PHHS',
+    content: 'Gia đình cháu Ngọc Lâm chân thành cảm ơn các thầy cô! Hẹn gặp lại các thầy cô ở trại hè sau! (Cháu đang muốn sang năm đi trại hè ở Mỹ) Hi hi. Các con chơi vui quá! Con bảo là con rất thích! Sang năm mẹ lại cho con đi nữa. Hi! Cảm ơn các thầy cô BME rất nhiều!',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    order: 1
+  },
+  {
+    id: '2',
+    name: 'Lan MT',
+    role: 'PHHS',
+    content: 'Xin chân thành cảm ơn BME, cảm ơn cô Yến, cô Linh và mọi người đã luôn chăm sóc, chu toàn cho các con. Đặc biệt cảm ơn cô Linh xinh xắn đã trở thành người bạn của các con, luôn cập nhật tình hình hàng ngày cho các bố mẹ ở nhà bằng những đoạn văn rất hay, giàu cảm xúc, được minh họa bằng những bức ảnh thật sinh động. Xin cảm ơn! ❤️',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200',
+    order: 2
+  }
+];

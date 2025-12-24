@@ -321,6 +321,59 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-24 bg-[#4a0d0d] relative overflow-hidden">
+        {/* Snow/Bubble Effect */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-white/20 rounded-full blur-sm animate-snow"
+              style={{
+                left: `${Math.random() * 100}%`,
+                width: `${Math.random() * 6 + 2}px`,
+                height: `${Math.random() * 6 + 2}px`,
+                animationDuration: `${Math.random() * 10 + 5}s`,
+                animationDelay: `${Math.random() * 5}s`,
+                opacity: Math.random() * 0.4 + 0.1
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase border-b-2 border-white/20 pb-6 inline-block">
+              Phụ huynh học sinh nói về chúng tôi
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+            {state.testimonials?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((t) => (
+              <div key={t.id} className="flex flex-col md:flex-row gap-8 items-start group">
+                <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                  <img src={getAssetPath(t.image || (t.role === 'PHHS' ? '/assets/3d/women.png' : '/assets/3d/cap.png'))} className="w-full h-full object-cover" alt={t.name} />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={18} className={i < t.rating ? "fill-orange-400 text-orange-400" : "text-white/20"} />
+                    ))}
+                  </div>
+                  <p className="text-white/90 text-lg font-medium leading-relaxed italic">
+                    "{t.content}"
+                  </p>
+                  <div className="pt-2">
+                    <span className="text-white font-black text-xl tracking-tight uppercase">{t.name}</span>
+                    <span className="text-white/40 font-black text-sm uppercase tracking-widest ml-3">/ {t.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Public Documents Section */}
       <section id="documents" className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">

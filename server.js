@@ -47,7 +47,8 @@ const DataSchema = new mongoose.Schema({
     achievements: Array,
     messages: Array,
     categories: Array,
-    publicDocuments: Array
+    publicDocuments: Array,
+    testimonials: Array
 }, { timestamps: true });
 
 const DataModel = mongoose.model('Data', DataSchema);
