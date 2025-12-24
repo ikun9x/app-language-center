@@ -20,6 +20,7 @@ import {
   Sparkles,
   Zap,
   Circle,
+  FileText,
   Globe,
   ExternalLink,
   Search,
