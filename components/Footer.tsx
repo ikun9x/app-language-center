@@ -59,11 +59,11 @@ const Footer: React.FC = () => {
           <div className="bg-slate-800/40 p-6 rounded-3xl space-y-4 text-xs font-medium border border-slate-800/50 backdrop-blur-sm">
             <p className="flex items-center space-x-3">
               <ShieldCheck size={16} className="text-green-500" />
-              <span className="text-slate-300 truncate">Quyết định: {state.config.establishmentDecision}</span>
+              <span className="text-slate-300">Quyết định: {state.config.establishmentDecision}</span>
             </p>
             <p className="flex items-center space-x-3">
               <ShieldCheck size={16} className="text-blue-500" />
-              <span className="text-slate-300 truncate">MSDN: {state.config.businessLicense}</span>
+              <span className="text-slate-300">MSDN: {state.config.businessLicense}</span>
             </p>
             <p className="flex items-center space-x-3">
               <CheckCircle2 size={16} className="text-blue-500" />

@@ -311,11 +311,21 @@ const ContentManager: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-2">Quyết định thành lập</label>
-                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.establishmentDecision} onChange={e => setLocalConfig({ ...localConfig, establishmentDecision: e.target.value })} />
+                <textarea
+                  className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm resize-none"
+                  rows={2}
+                  value={localConfig.establishmentDecision}
+                  onChange={e => setLocalConfig({ ...localConfig, establishmentDecision: e.target.value })}
+                />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-2">Số giấy phép / Mã số thuế (MSDN)</label>
-                <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm" value={localConfig.businessLicense} onChange={e => setLocalConfig({ ...localConfig, businessLicense: e.target.value })} />
+                <textarea
+                  className="w-full p-4 bg-slate-50 rounded-xl outline-none text-sm resize-none"
+                  rows={2}
+                  value={localConfig.businessLicense}
+                  onChange={e => setLocalConfig({ ...localConfig, businessLicense: e.target.value })}
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
