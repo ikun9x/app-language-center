@@ -95,7 +95,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const stream = cloudinary.uploader.upload_stream(
-        { folder: 'binhminh_uploads' },
+        { folder: 'binhminh_uploads', access_mode: 'public' },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
             res.json({ url: result.secure_url });
@@ -108,7 +108,12 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const stream = cloudinary.uploader.upload_stream(
-        { folder: 'binhminh_pdfs', resource_type: 'auto' },
+        {
+            folder: 'binhminh_pdfs',
+            resource_type: 'auto',
+            access_mode: 'public',
+            flags: 'attachment:false'
+        },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
             res.json({ url: result.secure_url });
@@ -123,41 +128,58 @@ app.delete('/api/delete-file', async (req, res) => {
 
     try {
         if (url.includes('cloudinary.com')) {
-            // Extract public_id for Cloudinary deletion
-            // Example: https://res.cloudinary.com/djzcocm5c/image/upload/v1735031127/binhminh_uploads/z6160566373322_5174092d061c28c86d888f4e91022830_itaxsw.jpg
-            const parts = url.split('/');
-            const filenameWithExt = parts[parts.length - 1];
+            // Robust extraction of public_id
+            // Cloudinary URL: .../upload/[version]/[folder]/[id].[ext]
+            const urlParts = url.split('/');
+            const filenameWithExt = urlParts.pop();
             const publicId = filenameWithExt.split('.')[0];
-            const folder = url.includes('binhminh_pdfs') ? 'binhminh_pdfs' : 'binhminh_uploads';
-            const fullPublicId = `${folder}/${publicId}`;
 
-            // Try to delete as raw first (for PDFs)
-            try {
-                await cloudinary.uploader.destroy(fullPublicId, { resource_type: 'raw' });
-            } catch (e) { }
+            // Find the folder part (usually after 'upload/')
+            const uploadIndex = urlParts.indexOf('upload');
+            let folder = '';
+            if (uploadIndex !== -1 && urlParts.length > uploadIndex + 2) {
+                // If there's a version (starts with 'v'), skip it
+                const afterUpload = urlParts[uploadIndex + 1];
+                if (afterUpload.startsWith('v')) {
+                    folder = urlParts.slice(uploadIndex + 2).join('/');
+                } else {
+                    folder = urlParts.slice(uploadIndex + 1).join('/');
+                }
+            }
 
-            // Try to delete as image (for images)
-            try {
-                await cloudinary.uploader.destroy(fullPublicId, { resource_type: 'image' });
-            } catch (e) { }
+            const fullPublicId = folder ? `${folder}/${publicId}` : publicId;
+            console.log('Deleting Cloudinary resource:', fullPublicId);
 
+            // Try all possible resource types to be safe
+            const types = ['image', 'raw', 'video'];
+            for (const rType of types) {
+                try {
+                    await cloudinary.uploader.destroy(fullPublicId, { resource_type: rType });
+                } catch (e) {
+                    console.warn(`Failed to delete as ${rType}:`, e.message);
+                }
+            }
             return res.json({ success: true });
         }
 
         // Fallback for local files
-        const filename = path.basename(url);
-        let filePath = path.join(UPLOAD_DIR, filename);
-        if (!fs.existsSync(filePath)) filePath = path.join(PDF_DIR, filename);
+        try {
+            const urlObj = new URL(url.startsWith('http') ? url : `http://localhost${url}`);
+            const filename = path.basename(urlObj.pathname);
+            const isPdf = urlObj.pathname.includes('/pdfs/');
+            const filePath = path.join(__dirname, 'public', isPdf ? 'pdfs' : 'uploads', filename);
 
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ error: 'File not found' });
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        } catch (err) {
+            console.error('Local file delete error:', err);
         }
+
+        res.json({ success: true });
     } catch (err) {
-        console.error('Error deleting file:', err);
-        res.status(500).json({ error: 'Failed to delete file' });
+        console.error('Delete-file endpoint error:', err);
+        res.status(500).json({ error: err.message });
     }
 });
 

@@ -115,13 +115,5 @@
     "Tiếng Anh Doanh Nghiệp",
     "Young Learners"
   ],
-  "publicDocuments": [
-    {
-      "id": "1766558925738",
-      "name": "test_document.pdf",
-      "type": "PDF",
-      "uploadDate": "24/12/2025",
-      "url": "http://localhost:5001/pdfs/1766558925731-102179673.pdf"
-    }
-  ]
+  "publicDocuments": []
 }
