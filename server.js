@@ -107,11 +107,20 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
+    const originalName = req.file.originalname;
+    const nameWithoutExt = path.parse(originalName).name;
+    const uniqueId = Date.now();
+    const publicId = `${nameWithoutExt}_${uniqueId}`;
+
     const stream = cloudinary.uploader.upload_stream(
         {
             folder: 'binhminh_pdfs',
-            resource_type: 'raw',
-            access_mode: 'public'
+            resource_type: 'image',
+            access_mode: 'public',
+            public_id: publicId,
+            format: 'pdf',
+            use_filename: true,
+            unique_filename: true
         },
         (error, result) => {
             if (error) return res.status(500).json({ error: error.message });
