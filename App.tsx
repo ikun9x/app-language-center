@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppState, GuestMessage } from './types';
-import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, AppContext } from './constants';
+import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, AppContext } from './constants';
 
 // --- Components ---
 import Navbar from './components/Navbar';

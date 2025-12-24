@@ -21,7 +21,7 @@
     "brandNamePrincipal": "BÌNH MINH",
     "brandNameSub": "LANGUAGE CENTER",
     "brandShortName": "",
-    "brandLogoImage": "http://localhost:5001/uploads/1766506378705-208546692.png"
+    "brandLogoImage": "/uploads/1766506378705-208546692.png"
   },
   "courses": [
     {
@@ -106,26 +106,8 @@
       "description": "Nhận bằng khen từ Sở Giáo dục Đào tạo tỉnh Tây Ninh."
     }
   ],
-  "messages": [
-    {
-      "name": "Test User",
-      "email": "test@example.com",
-      "phone": "0123456789",
-      "message": "I am interested in the English course.",
-      "id": "1766498126158",
-      "timestamp": "12/23/2025, 8:55:26 PM",
-      "replied": false
-    },
-    {
-      "name": "Trần Đạt",
-      "email": "trandat.it1204@gmail.com",
-      "phone": "090909999898",
-      "message": "Tôi quan tâm đến khóa học: Dành cho người đi làm",
-      "id": "1766495785814",
-      "timestamp": "12/23/2025, 8:16:25 PM",
-      "replied": false
-    }
-  ],
+  "messages": [],
+  "isAuthenticated": true,
   "categories": [
     "Tiếng Anh Giao Tiếp",
     "Luyện Thi IELTS",
@@ -133,8 +115,13 @@
     "Tiếng Anh Doanh Nghiệp",
     "Young Learners"
   ],
-  "publicDocuments": [],
-  "isAuthenticated": true,
-  "lastLoginDay": "2025-12-23"
+  "publicDocuments": [
+    {
+      "id": "1766558925738",
+      "name": "test_document.pdf",
+      "type": "PDF",
+      "uploadDate": "24/12/2025",
+      "url": "http://localhost:5001/pdfs/1766558925731-102179673.pdf"
+    }
+  ]
 }
-```
