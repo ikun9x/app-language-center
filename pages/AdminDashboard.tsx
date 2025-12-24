@@ -69,7 +69,7 @@ const AdminDashboard: React.FC = () => {
         <div className="flex items-center space-x-3 mb-10 px-2">
           <div className={state.config.brandLogoImage ? "" : "bg-blue-600 p-2 rounded-lg font-bold text-white"}>
             {state.config.brandLogoImage ? (
-              <img src={getAssetPath(state.config.brandLogoImage)} className="w-10 h-10 object-contain" alt="Logo" />
+              <img src={getAssetPath(state.config.brandLogoImage)} className="w-14 h-14 object-contain" alt="Logo" />
             ) : (
               state.config.brandShortName
             )}

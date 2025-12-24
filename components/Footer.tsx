@@ -14,15 +14,18 @@ const Footer: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
         <div className="space-y-8">
-          <div className="flex items-center space-x-3 text-white group cursor-pointer">
-            <div className="bg-blue-600 p-2.5 rounded-xl font-black text-lg transition-transform group-hover:rotate-12">
+          <div className="flex items-center space-x-6 text-white group cursor-pointer">
+            <div className="w-20 h-20 rounded-full border-2 border-white/20 p-1 flex items-center justify-center bg-white shadow-xl overflow-hidden transition-transform group-hover:scale-105">
               {state.config.brandLogoImage ? (
-                <img src={getAssetPath(state.config.brandLogoImage)} className="w-8 h-8 object-contain" alt="Logo" />
+                <img src={getAssetPath(state.config.brandLogoImage)} className="w-full h-full object-contain" alt="Logo" />
               ) : (
-                state.config.brandShortName
+                <span className="text-blue-600 font-black">{state.config.brandShortName}</span>
               )}
             </div>
-            <span className="font-black text-2xl tracking-tighter">{state.config.brandNamePrincipal}</span>
+            <div className="flex flex-col">
+              <span className="font-black text-3xl tracking-tighter text-white">{state.config.brandNamePrincipal}</span>
+              <span className="font-bold text-xs tracking-[0.2em] text-blue-400 uppercase">{state.config.brandNameSub}</span>
+            </div>
           </div>
           <p className="text-base leading-relaxed font-medium text-slate-400">
             Hệ thống đào tạo ngôn ngữ chất lượng cao tại Cần Đước, Tây Ninh. Đồng hành cùng bạn trên con đường chinh phục tiếng Anh.
