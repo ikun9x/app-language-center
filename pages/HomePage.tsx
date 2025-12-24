@@ -108,8 +108,8 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-12 md:pt-20 pb-16 md:pb-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto w-full relative">
-          <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-24 md:py-32 overflow-hidden relative shadow-2xl 
-          shadow-blue-900/40 min-h-[500px] flex flex-col justify-center">
+          <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-16 md:py-20 overflow-hidden relative shadow-2xl 
+          shadow-blue-900/40 min-h-[450px] flex flex-col justify-center">
             {/* Decorative circles - Moved to background */}
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
             <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-900/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
@@ -191,7 +191,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats / Highlights - Compact */}
-      <section className="relative z-40 mt-12 md:mt-20 px-6">
+      <section className="relative z-40 -mt-16 md:-mt-24 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'NĂM KINH NGHIỆM', value: state.config.statsYears || '10+', color: 'bg-rose-50', iconColor: 'bg-rose-500', icon: <BookOpen className="text-white" size={20} />, textColor: 'text-rose-600' },
