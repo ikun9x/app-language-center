@@ -78,6 +78,7 @@ const App: React.FC = () => {
             config: INITIAL_CONFIG,
             achievements: INITIAL_ACHIEVEMENTS,
             messages: [],
+            publicDocuments: INITIAL_DOCUMENTS,
             isAuthenticated: !!adminCred
           });
         }
@@ -100,7 +101,8 @@ const App: React.FC = () => {
         teachers: state.teachers,
         achievements: state.achievements,
         messages: state.messages,
-        categories: state.categories
+        categories: state.categories,
+        publicDocuments: state.publicDocuments
       }));
 
       try {
