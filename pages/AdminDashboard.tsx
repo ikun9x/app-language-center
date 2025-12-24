@@ -28,7 +28,8 @@ import {
   Phone,
   Send,
   FileText,
-  ExternalLink
+  ExternalLink,
+  HardDrive
 } from 'lucide-react';
 const UPLOAD_BASE_URL = 'http://localhost:5001/uploads/';
 
@@ -85,6 +86,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} />
           <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} />
           <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} />
+          <SidebarLink to="/admin/system" icon={<HardDrive size={20} />} label="Tối ưu hệ thống" active={location.pathname === '/admin/system'} />
           <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} />
           <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} />
           <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} />
@@ -110,6 +112,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="seo" element={<SeoManager />} />
           <Route path="teachers" element={<TeachersManager />} />
           <Route path="documents" element={<DocumentsManager />} />
+          <Route path="system" element={<SystemOptimizer />} />
           <Route path="compliance" element={<ComplianceManager />} />
         </Routes>
       </main>
@@ -1450,6 +1453,124 @@ const DocumentsManager = () => {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+};
+
+const SystemOptimizer: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [junkFiles, setJunkFiles] = useState<any[]>([]);
+  const [scanned, setScanned] = useState(false);
+
+  const scanForGarbage = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5001/api/garbage-collector');
+      const data = await res.json();
+      setJunkFiles(data.files);
+      setScanned(true);
+      toast.info(`Tìm thấy ${data.files.length} tệp rác`);
+    } catch (e) {
+      toast.error('Lỗi khi quét tệp rác');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cleanGarbage = async () => {
+    if (!window.confirm(`Bạn có chắc muốn xóa ${junkFiles.length} tệp này?`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5001/api/garbage-collector?action=delete');
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Đã xóa thành công ${data.deleted} tệp rác`);
+        setJunkFiles([]);
+        setScanned(true);
+      }
+    } catch (e) {
+      toast.error('Lỗi khi xóa tệp rác');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl space-y-10">
+      <div>
+        <h2 className="text-3xl font-extrabold text-slate-900">Tối ưu hệ thống</h2>
+        <p className="text-slate-500">Dọn dẹp các tệp tin dư thừa không được sử dụng trong cơ sở dữ liệu.</p>
+      </div>
+
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-sm space-y-8">
+        <div className="flex items-center justify-between p-6 bg-blue-50 rounded-3xl">
+          <div className="space-y-1">
+            <h4 className="font-bold text-blue-900">Quét tệp rác</h4>
+            <p className="text-sm text-blue-700/70">Hệ thống sẽ tìm các ảnh và tài liệu trong thư mục uploads/pdfs nhưng không có trong trang web.</p>
+          </div>
+          <button
+            onClick={scanForGarbage}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Đang xử lý...' : 'Bắt đầu quét'}
+          </button>
+        </div>
+
+        {scanned && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-black text-slate-900">Kết quả quét: {junkFiles.length} tệp</h3>
+              {junkFiles.length > 0 && (
+                <button
+                  onClick={cleanGarbage}
+                  className="bg-red-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-red-700 transition flex items-center gap-2"
+                >
+                  <Trash2 size={18} /> Dọn dẹp tất cả
+                </button>
+              )}
+            </div>
+
+            {junkFiles.length > 0 ? (
+              <div className="border border-slate-100 rounded-3xl overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase">Tên tệp</th>
+                      <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase">Thư mục</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {junkFiles.map((file, idx) => (
+                      <tr key={idx}>
+                        <td className="px-6 py-4 text-sm font-medium text-slate-700">{file.name}</td>
+                        <td className="px-6 py-4 text-sm text-slate-500 uppercase">{file.dir}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-slate-50 rounded-3xl text-slate-400 font-medium">
+                Tuyệt vời! Hệ thống của bạn đã sạch sẽ, không tìm thấy tệp rác nào.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex gap-4">
+        <div className="p-3 bg-amber-100 text-amber-600 rounded-2xl h-fit">
+          <ShieldAlert size={24} />
+        </div>
+        <div className="space-y-1">
+          <h4 className="font-bold text-amber-900">Lưu ý quan trọng</h4>
+          <p className="text-sm text-amber-800/70 leading-relaxed">
+            Dung lượng thư mục `node_modules` (~240MB) và `dist` (~50MB) là các thành phần kỹ thuật cần thiết để chạy dự án tại máy bộ.
+            <strong> Chúng KHÔNG được tải lên GitHub</strong> nên bạn không cần lo lắng về giới hạn dung lượng của GitHub.
+          </p>
+        </div>
       </div>
     </div>
   );

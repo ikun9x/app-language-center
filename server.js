@@ -135,6 +135,72 @@ app.delete('/api/delete-file', (req, res) => {
     }
 });
 
+// --- Garbage Collector ---
+app.get('/api/garbage-collector', (req, res) => {
+    try {
+        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        const usedFiles = new Set();
+
+        // Helper to extract filename from URL or path
+        const extractFilename = (str) => {
+            if (!str || typeof str !== 'string') return null;
+            if (str.startsWith('http')) {
+                const parts = str.split('/');
+                return parts[parts.length - 1];
+            }
+            if (str.startsWith('/uploads/') || str.startsWith('/pdfs/')) {
+                return path.basename(str);
+            }
+            return null;
+        };
+
+        // Recurse through data to find all used files
+        const findUsedFiles = (obj) => {
+            if (!obj) return;
+            if (typeof obj === 'string') {
+                const filename = extractFilename(obj);
+                if (filename) usedFiles.add(filename);
+            } else if (Array.isArray(obj)) {
+                obj.forEach(findUsedFiles);
+            } else if (typeof obj === 'object') {
+                Object.values(obj).forEach(findUsedFiles);
+            }
+        };
+
+        findUsedFiles(data);
+
+        const checkDir = (dir) => {
+            if (!fs.existsSync(dir)) return [];
+            return fs.readdirSync(dir).filter(file => {
+                return !usedFiles.has(file) && fs.statSync(path.join(dir, file)).isFile();
+            });
+        };
+
+        const junkUploads = checkDir(UPLOAD_DIR);
+        const junkPdfs = checkDir(PDF_DIR);
+
+        const allJunk = [
+            ...junkUploads.map(f => ({ name: f, dir: 'uploads', path: path.join(UPLOAD_DIR, f) })),
+            ...junkPdfs.map(f => ({ name: f, dir: 'pdfs', path: path.join(PDF_DIR, f) }))
+        ];
+
+        if (req.query.action === 'delete') {
+            allJunk.forEach(file => {
+                try {
+                    fs.unlinkSync(file.path);
+                } catch (e) {
+                    console.error(`Failed to delete ${file.path}:`, e);
+                }
+            });
+            return res.json({ success: true, deleted: allJunk.length, files: allJunk });
+        }
+
+        res.json({ success: true, count: allJunk.length, files: allJunk });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Backend server running at http://localhost:${PORT}`);
 });
