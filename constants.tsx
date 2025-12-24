@@ -210,3 +210,24 @@ export const INITIAL_TESTIMONIALS: Testimonial[] = [
     order: 6
   }
 ];
+
+export const INITIAL_BLOG_POSTS: BlogPost[] = [
+  {
+    id: '1',
+    title: 'TUYỂN DỤNG GV VIỆT NAM GIẢNG DẠY IELTS',
+    summary: 'Trung tâm ngoại ngữ Bình Minh (BME) đang tìm kiếm IELTS trainer fulltime và parttime...',
+    content: '<h2>Thông tin lớp học:</h2><ul><li>Đối tượng học viên: giáo viên Việt Nam</li><li>Số lượng: dự kiến 20 học viên/ lớp</li></ul><h3>Nhiệm vụ:</h3><ul><li>Chuẩn bị giáo án, danh sách học cụ...</li></ul>',
+    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800',
+    date: '01/10/2023',
+    category: 'Tuyển dụng'
+  },
+  {
+    id: '2',
+    title: 'ĐƯỜNG ĐUA KỲ THÚ TIỂU HỌC LONG BIÊN NĂM HỌC 2022-2023',
+    summary: 'Sáng 18/03, chương trình “Giao lưu tiếng anh – English Marathon” đã diễn ra thành...',
+    content: '<p>Chương trình giao lưu đã thu hút đông đảo các em học sinh tham gia với các hoạt động bổ ích...</p>',
+    image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800',
+    date: '18/03/2023',
+    category: 'Sự kiện'
+  }
+];

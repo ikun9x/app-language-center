@@ -97,6 +97,16 @@ export interface Testimonial {
   order?: number;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  image: string;
+  date: string;
+  category: string;
+}
+
 export interface AppState {
   config: SiteConfig;
   courses: Course[];
@@ -107,4 +117,5 @@ export interface AppState {
   categories: string[];
   publicDocuments: PublicDocument[];
   testimonials: Testimonial[];
+  blogPosts: BlogPost[];
 }

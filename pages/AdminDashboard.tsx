@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useApp, API_BASE_URL } from '../constants';
 import { getAssetPath } from '../utils';
@@ -138,6 +140,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} onClick={closeSidebar} />
           <SidebarLink to="/admin/system" icon={<HardDrive size={20} />} label="Tối ưu hệ thống" active={location.pathname === '/admin/system'} onClick={closeSidebar} />
           <SidebarLink to="/admin/leads" icon={<MessageSquare size={20} />} label="Yêu cầu tư vấn" active={location.pathname === '/admin/leads'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/blog" icon={<FileText size={20} />} label="Tin tức & Thư viện" active={location.pathname === '/admin/blog'} onClick={closeSidebar} />
           <SidebarLink to="/admin/seo" icon={<Search size={20} />} label="Quản trị SEO" active={location.pathname === '/admin/seo'} onClick={closeSidebar} />
           <SidebarLink to="/admin/compliance" icon={<ShieldAlert size={20} />} label="Bảo mật & Pháp lý" active={location.pathname === '/admin/compliance'} onClick={closeSidebar} />
         </nav>
@@ -167,6 +170,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="documents" element={<DocumentsManager />} />
           <Route path="system" element={<SystemOptimizer />} />
           <Route path="compliance" element={<ComplianceManager />} />
+          <Route path="blog" element={<BlogPostsManager />} />
         </Routes>
       </main>
     </div>
@@ -2260,6 +2264,151 @@ const ComplianceManager: React.FC = () => {
           <button className="text-blue-600 text-sm font-bold mt-2">Cập nhật nội dung →</button>
         </div>
       </div>
+    </div>
+  );
+};
+
+const BlogPostsManager: React.FC = () => {
+  const { state, updateState } = useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [editingPost, setEditingPost] = useState<any>(null);
+  const [localPost, setLocalPost] = useState<any>({ title: '', summary: '', content: '', image: '', category: 'Sự kiện', date: new Date().toLocaleDateString('vi-VN') });
+
+  const handleEdit = (post: any) => {
+    setEditingPost(post);
+    setLocalPost(post);
+    setShowModal(true);
+  };
+
+  const handleCreate = () => {
+    setEditingPost(null);
+    setLocalPost({ title: '', summary: '', content: '', image: '', category: 'Sự kiện', date: new Date().toLocaleDateString('vi-VN') });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (post: any) => {
+    if (window.confirm('Bạn có chắc muốn xóa bài viết này?')) {
+      await deletePhysicalFile(post.image);
+      updateState({ blogPosts: state.blogPosts.filter(p => p.id !== post.id) });
+      toast.success('Đã xóa bài viết!');
+    }
+  };
+
+  const handleSave = () => {
+    if (editingPost) {
+      updateState({ blogPosts: state.blogPosts.map(p => p.id === editingPost.id ? { ...localPost, id: p.id } : p) });
+      toast.success('Cập nhật thành công!');
+    } else {
+      const newPost = { ...localPost, id: Date.now().toString() };
+      updateState({ blogPosts: [newPost, ...state.blogPosts] });
+      toast.success('Đã tạo bài viết mới!');
+    }
+    setShowModal(false);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.url) setLocalPost({ ...localPost, image: data.url });
+    } catch (err) {
+      toast.error('Tải ảnh thất bại!');
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-extrabold text-slate-900">Tin tức & Thư viện</h2>
+          <p className="text-slate-500">Quản lý các bài viết tin tức và hình ảnh sự kiện.</p>
+        </div>
+        <button onClick={handleCreate} className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-blue-100">
+          <PlusCircle size={20} /> Tạo bài viết mới
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {state.blogPosts.map(post => (
+          <div key={post.id} className="bg-white rounded-[2rem] border overflow-hidden group hover:shadow-xl transition-all">
+            <div className="relative h-48">
+              <img src={post.image} className="w-full h-full object-cover" alt="" />
+              <div className="absolute top-4 right-4 flex gap-2">
+                <button onClick={() => handleEdit(post)} className="p-2 bg-white/90 rounded-lg text-blue-600 shadow-sm"><Edit3 size={18} /></button>
+                <button onClick={() => handleDelete(post)} className="p-2 bg-white/90 rounded-lg text-red-600 shadow-sm"><Trash2 size={18} /></button>
+              </div>
+            </div>
+            <div className="p-6 space-y-3">
+              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{post.category}</span>
+              <h3 className="font-bold text-lg line-clamp-2">{post.title}</h3>
+              <p className="text-sm text-slate-500 line-clamp-2">{post.summary}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col">
+            <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
+              <h3 className="text-xl font-black">{editingPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h3>
+              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-200 rounded-full transition"><X size={20} /></button>
+            </div>
+            <div className="p-8 overflow-y-auto space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tiêu đề bài viết</label>
+                  <input className="w-full p-4 bg-slate-50 rounded-2xl outline-none" value={localPost.title} onChange={e => setLocalPost({ ...localPost, title: e.target.value })} placeholder="VD: Tuyển dụng giáo viên English..." />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Danh mục</label>
+                  <select className="w-full p-4 bg-slate-50 rounded-2xl outline-none" value={localPost.category} onChange={e => setLocalPost({ ...localPost, category: e.target.value })}>
+                    <option>Sự kiện</option>
+                    <option>Tin tức</option>
+                    <option>Tuyển dụng</option>
+                    <option>Thư viện</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tóm tắt ngắn (Summary)</label>
+                <textarea className="w-full p-4 bg-slate-50 rounded-2xl outline-none resize-none" rows={2} value={localPost.summary} onChange={e => setLocalPost({ ...localPost, summary: e.target.value })} placeholder="Mô tả ngắn gọn nội dung bài viết..." />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Ảnh đại diện</label>
+                <div className="flex gap-4 items-center">
+                  <div className="w-32 h-24 bg-slate-100 rounded-2xl overflow-hidden border">
+                    {localPost.image ? <img src={localPost.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon size={32} /></div>}
+                  </div>
+                  <label className="bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-bold cursor-pointer hover:bg-blue-100 transition">
+                    Tải ảnh lên <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nội dung chi tiết (Rich Text)</label>
+                <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 min-h-[300px]">
+                  <ReactQuill theme="snow" value={localPost.content} onChange={val => setLocalPost({ ...localPost, content: val })} className="bg-white h-[250px]" />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-6">
+                <button onClick={handleSave} className="bg-blue-600 text-white px-10 py-5 rounded-[2rem] font-black shadow-xl shadow-blue-100 transition transform active:scale-95">
+                  Lưu bài viết ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

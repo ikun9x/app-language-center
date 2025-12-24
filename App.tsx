@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppState, GuestMessage } from './types';
-import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, INITIAL_TESTIMONIALS, AppContext, API_BASE_URL } from './constants';
+import { INITIAL_CONFIG, INITIAL_COURSES, INITIAL_TEACHERS, INITIAL_ACHIEVEMENTS, INITIAL_CATEGORIES, INITIAL_DOCUMENTS, INITIAL_TESTIMONIALS, INITIAL_BLOG_POSTS, AppContext, API_BASE_URL } from './constants';
 
 // --- Components ---
 import Navbar from './components/Navbar';
@@ -24,7 +24,8 @@ const App: React.FC = () => {
     isAuthenticated: false,
     categories: INITIAL_CATEGORIES,
     publicDocuments: INITIAL_DOCUMENTS,
-    testimonials: INITIAL_TESTIMONIALS
+    testimonials: INITIAL_TESTIMONIALS,
+    blogPosts: INITIAL_BLOG_POSTS
   });
   const [loading, setLoading] = useState(true);
 
@@ -46,6 +47,7 @@ const App: React.FC = () => {
           if (!data.messages) data.messages = [];
           if (!data.publicDocuments) data.publicDocuments = INITIAL_DOCUMENTS;
           if (!data.testimonials || data.testimonials.length === 0) data.testimonials = INITIAL_TESTIMONIALS;
+          if (!data.blogPosts) data.blogPosts = INITIAL_BLOG_POSTS;
 
           const adminCred = localStorage.getItem('bm_admin_cred');
           setState({ ...data, isAuthenticated: !!adminCred });
@@ -72,6 +74,9 @@ const App: React.FC = () => {
           if (!parsed.testimonials || parsed.testimonials.length === 0) {
             parsed.testimonials = INITIAL_TESTIMONIALS;
           }
+          if (!parsed.blogPosts) {
+            parsed.blogPosts = INITIAL_BLOG_POSTS;
+          }
 
           setState({ ...parsed, isAuthenticated: !!adminCred });
         } else {
@@ -86,6 +91,7 @@ const App: React.FC = () => {
             messages: [],
             publicDocuments: INITIAL_DOCUMENTS,
             testimonials: INITIAL_TESTIMONIALS,
+            blogPosts: INITIAL_BLOG_POSTS,
             isAuthenticated: !!adminCred
           });
         }
@@ -110,7 +116,8 @@ const App: React.FC = () => {
         messages: state.messages,
         categories: state.categories,
         publicDocuments: state.publicDocuments,
-        testimonials: state.testimonials
+        testimonials: state.testimonials,
+        blogPosts: state.blogPosts
       }));
 
       try {
