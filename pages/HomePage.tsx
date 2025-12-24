@@ -19,7 +19,8 @@ import {
   Star,
   Sparkles,
   Zap,
-  Circle
+  Circle,
+  FileText
 } from 'lucide-react';
 
 import { toast } from 'react-toastify';
@@ -272,6 +273,67 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Public Documents Section */}
+      <section id="documents" className="py-24 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <span className="bg-blue-50 text-blue-600 px-6 py-2 rounded-full text-sm font-black tracking-widest uppercase mb-4 inline-block">Niêm yết</span>
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Văn bản Công khai</h2>
+            <div className="w-24 h-2 bg-blue-600 mx-auto mt-6 rounded-full"></div>
+          </div>
+
+          <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Tên tài liệu</th>
+                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Loại</th>
+                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Ngày đăng</th>
+                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Xem tài liệu</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {state.publicDocuments && state.publicDocuments.length > 0 ? (
+                  state.publicDocuments.map(doc => (
+                    <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-3 bg-red-50 text-red-500 rounded-xl">
+                            <FileText size={20} />
+                          </div>
+                          <span className="font-bold text-slate-700">{doc.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-center">
+                        <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">{doc.type}</span>
+                      </td>
+                      <td className="px-8 py-6 text-center text-slate-500 font-medium">{doc.uploadDate}</td>
+                      <td className="px-8 py-6 text-center">
+                        <a
+                          href={getAssetPath(doc.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-black"
+                        >
+                          <FileText size={18} />
+                          <span>Mở PDF</span>
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-20 text-center text-slate-400">
+                      Hiện chưa có văn bản công khai nào được đăng tải.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form */}
       <section id="contact" className="py-24 px-4 md:px-6 bg-white overflow-hidden relative">
         <div className="max-w-6xl mx-auto">
@@ -353,6 +415,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
       {showVideoModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-xl" onClick={() => setShowVideoModal(false)} />
