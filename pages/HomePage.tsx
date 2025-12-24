@@ -282,54 +282,71 @@ const HomePage: React.FC = () => {
             <div className="w-24 h-2 bg-blue-600 mx-auto mt-6 rounded-full"></div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Tên tài liệu</th>
-                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Loại</th>
-                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Ngày đăng</th>
-                  <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Xem tài liệu</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {state.publicDocuments && state.publicDocuments.length > 0 ? (
-                  state.publicDocuments.map(doc => (
-                    <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
-                      <td className="px-8 py-6">
-                        <div className="flex items-center space-x-4">
-                          <div className="p-3 bg-red-50 text-red-500 rounded-xl">
-                            <FileText size={20} />
+          <div className="bg-white rounded-[3rem] shadow-2xl shadow-blue-900/10 border border-slate-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-100">
+                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest">Thông tin văn bản</th>
+                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Định dạng</th>
+                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Ngày ban hành</th>
+                    <th className="px-10 py-8 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Tùy chọn</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {state.publicDocuments && state.publicDocuments.length > 0 ? (
+                    state.publicDocuments.map(doc => (
+                      <tr key={doc.id} className="group hover:bg-blue-50/30 transition-all duration-300">
+                        <td className="px-10 py-8">
+                          <div className="flex items-center gap-6">
+                            <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all duration-500 flex-shrink-0">
+                              <FileText size={28} />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-extrabold text-slate-900 text-xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+                                {doc.label || doc.name}
+                              </span>
+                              <span className="text-sm font-medium text-slate-400 mt-1 flex items-center gap-2">
+                                <Globe size={14} /> Hệ thống lưu trữ công khai
+                              </span>
+                            </div>
                           </div>
-                          <span className="font-bold text-slate-700">{doc.name}</span>
+                        </td>
+                        <td className="px-10 py-8 text-center">
+                          <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-black uppercase tracking-wider">
+                            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                            {doc.type}
+                          </span>
+                        </td>
+                        <td className="px-10 py-8 text-center">
+                          <span className="text-slate-500 font-bold">{doc.uploadDate}</span>
+                        </td>
+                        <td className="px-10 py-8 text-right">
+                          <a
+                            href={getAssetPath(doc.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 group-hover:shadow-blue-500/20"
+                          >
+                            <ExternalLink size={18} />
+                            <span>Xem văn bản</span>
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-10 py-32 text-center text-slate-400 font-bold">
+                        <div className="flex flex-col items-center gap-4 opacity-20">
+                          <FileText size={64} />
+                          <p className="text-2xl">Hiện chưa có văn bản niêm yết</p>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-center">
-                        <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">{doc.type}</span>
-                      </td>
-                      <td className="px-8 py-6 text-center text-slate-500 font-medium">{doc.uploadDate}</td>
-                      <td className="px-8 py-6 text-center">
-                        <a
-                          href={getAssetPath(doc.url)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-black"
-                        >
-                          <FileText size={18} />
-                          <span>Mở PDF</span>
-                        </a>
-                      </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-8 py-20 text-center text-slate-400">
-                      Hiện chưa có văn bản công khai nào được đăng tải.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

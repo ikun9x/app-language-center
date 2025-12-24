@@ -41,6 +41,7 @@ export interface GuestMessage {
 export interface PublicDocument {
   id: string;
   name: string;
+  label?: string;
   type: string;
   uploadDate: string;
   url: string;

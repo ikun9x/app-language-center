@@ -1326,6 +1326,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
 const DocumentsManager = () => {
   const { state, updateState } = useApp();
   const [isUploading, setIsUploading] = useState(false);
+  const [newDocLabel, setNewDocLabel] = useState('');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1351,11 +1352,13 @@ const DocumentsManager = () => {
         const newDoc: PublicDocument = {
           id: Date.now().toString(),
           name: file.name,
+          label: newDocLabel.trim() || file.name,
           type: 'PDF',
           uploadDate: new Date().toLocaleDateString('vi-VN'),
           url
         };
         updateState({ publicDocuments: [...state.publicDocuments, newDoc] });
+        setNewDocLabel('');
         toast.success('Đã tải lên tài liệu thành công');
       } else {
         toast.error('Lỗi khi tải lên tệp');
@@ -1392,16 +1395,26 @@ const DocumentsManager = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-        <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+        <div className="flex-1">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Văn bản Công khai</h2>
           <p className="text-slate-500 font-medium mt-1">Quản lý các tài liệu PDF công khai của trung tâm</p>
         </div>
-        <label className="flex items-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95">
-          {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
-          <span>Tải lên tài liệu mới</span>
-          <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
-        </label>
+
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Nhãn văn bản (VD: Quyết định thành lập...)"
+            className="px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none transition font-bold text-slate-700 min-w-[300px]"
+            value={newDocLabel}
+            onChange={(e) => setNewDocLabel(e.target.value)}
+          />
+          <label className="flex items-center justify-center gap-2 cursor-pointer bg-blue-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition transform hover:-translate-y-1 active:scale-95 whitespace-nowrap">
+            {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={20} />}
+            <span>Tải lên PDF</span>
+            <input type="file" className="hidden" accept=".pdf" onChange={handleUpload} disabled={isUploading} />
+          </label>
+        </div>
       </div>
 
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
@@ -1420,10 +1433,13 @@ const DocumentsManager = () => {
                 <tr key={doc.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="px-8 py-6">
                     <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 transition-transform">
+                      <div className="p-3 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
                         <FileText size={20} />
                       </div>
-                      <span className="font-bold text-slate-700">{doc.name}</span>
+                      <div className="flex flex-col">
+                        <span className="font-extrabold text-slate-900 text-lg leading-tight mb-1">{doc.label || doc.name}</span>
+                        <span className="text-xs font-medium text-slate-400 font-mono truncate max-w-[200px]">{doc.name}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
