@@ -149,6 +149,10 @@ const authenticate = (req, res, next) => {
 };
 
 // Endpoints
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
@@ -430,6 +434,6 @@ if (fs.existsSync(DIST_PATH)) {
     });
 }
 
-app.listen(PORT, () => {
-    console.log(`Backend server running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Backend server running on all interfaces (0.0.0.0) at port ${PORT}`);
 });
