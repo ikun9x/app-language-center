@@ -805,93 +805,96 @@ const CourseDetailModal: React.FC<{ course: any, onClose: () => void }> = ({ cou
           <X size={20} />
         </button>
 
-        {/* Left Side: Registration Form */}
-        <div className="w-full md:w-3/5 p-8 md:p-14 space-y-8 overflow-y-auto">
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">Đăng ký tư vấn <br /><span className="text-blue-500">miễn phí</span></h2>
-            <p className="text-slate-400 font-medium">Để lại thông tin, Bình Minh sẽ liên hệ hỗ trợ bạn ngay lập tức.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
-                placeholder="Họ và tên"
-                required
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-              />
-              <input
-                className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
-                placeholder="Số điện thoại"
-                required
-                value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <input
-              className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
-              placeholder="Địa chỉ Email (nếu có)"
-              type="email"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-            />
-            <textarea
-              className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium min-h-[120px]"
-              placeholder="Bạn có thắc mắc gì thêm không?"
-              value={formData.message}
-              onChange={e => setFormData({ ...formData, message: e.target.value })}
-            ></textarea>
-
-            <button
-              type="submit"
-              disabled={submitted}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition transform active:scale-95 shadow-xl shadow-blue-900/40 disabled:bg-slate-800 disabled:text-slate-500"
-            >
-              {submitted ? <>Gửi thành công! <CheckCircle size={20} /></> : <>Gửi thông tin ngay <Send size={20} /></>}
-            </button>
-          </form>
-        </div>
-
-        {/* Right Side: Course Summary Card */}
-        <div className="w-full md:w-2/5 bg-slate-800/40 p-8 md:p-12 flex flex-col justify-center border-l border-slate-700/50 relative overflow-hidden">
-          {/* 3D Laptop Icon in Background (subtle) */}
-          <div className="absolute -bottom-10 -right-10 w-64 h-64 opacity-10 pointer-events-none">
-            <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
-          </div>
-
-          <div className="space-y-8 relative">
-            {/* Thumbnail */}
-            <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl group border border-white/10">
-              <img src={getAssetPath(course.image)} className="w-full h-full object-cover transform group-hover:scale-105 transition duration-700" alt={course.title} />
-              <div className="absolute inset-0 bg-slate-900/20" />
-              <div className="absolute top-4 left-4">
-                <span className="bg-blue-600 text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">
-                  {course.category}
-                </span>
-              </div>
-            </div>
-
-            {/* Course Info */}
+        {/* Main Content Area: Scrollable as a single unit on mobile */}
+        <div className="flex-1 overflow-y-auto md:flex md:flex-row no-scrollbar">
+          {/* Left Side: Registration Form */}
+          <div className="w-full md:w-3/5 p-8 md:p-14 space-y-8">
             <div className="space-y-4">
-              <h3 className="text-2xl font-black text-white leading-tight tracking-tight">{course.title}</h3>
-              <div className="flex items-center gap-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
-                <div className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg">
-                  <Clock size={16} className="text-blue-500" /> <span>{course.duration}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg">
-                  <Star size={16} className="text-amber-500" /> <span>Yêu thích 98%</span>
-                </div>
-              </div>
-              <p className="text-slate-400 text-sm leading-relaxed line-clamp-3 font-medium">
-                {course.description}
-              </p>
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">Đăng ký tư vấn <br /><span className="text-blue-500">miễn phí</span></h2>
+              <p className="text-slate-400 font-medium">Để lại thông tin, Bình Minh sẽ liên hệ hỗ trợ bạn ngay lập tức.</p>
             </div>
 
-            {/* Price section */}
-            <div className="pt-6 border-t border-slate-700/50">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Học phí trọn gói</p>
-              <div className="text-3xl font-black text-blue-500">{course.price}</div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
+                  placeholder="Họ và tên"
+                  required
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                />
+                <input
+                  className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
+                  placeholder="Số điện thoại"
+                  required
+                  value={formData.phone}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+              <input
+                className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium"
+                placeholder="Địa chỉ Email (nếu có)"
+                type="email"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+              />
+              <textarea
+                className="bg-slate-800/50 border-2 border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full transition-all font-medium min-h-[120px]"
+                placeholder="Bạn có thắc mắc gì thêm không?"
+                value={formData.message}
+                onChange={e => setFormData({ ...formData, message: e.target.value })}
+              ></textarea>
+
+              <button
+                type="submit"
+                disabled={submitted}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition transform active:scale-95 shadow-xl shadow-blue-900/40 disabled:bg-slate-800 disabled:text-slate-500"
+              >
+                {submitted ? <>Gửi thành công! <CheckCircle size={20} /></> : <>Gửi thông tin ngay <Send size={20} /></>}
+              </button>
+            </form>
+          </div>
+
+          {/* Right Side: Course Summary Card */}
+          <div className="w-full md:w-2/5 bg-slate-800/40 p-8 md:p-12 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-700/50 relative overflow-hidden">
+            {/* 3D Laptop Icon in Background (subtle) */}
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 opacity-10 pointer-events-none">
+              <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
+            </div>
+
+            <div className="space-y-8 relative">
+              {/* Thumbnail */}
+              <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl group border border-white/10">
+                <img src={getAssetPath(course.image)} className="w-full h-full object-cover transform group-hover:scale-105 transition duration-700" alt={course.title} />
+                <div className="absolute inset-0 bg-slate-900/20" />
+                <div className="absolute top-4 left-4">
+                  <span className="bg-blue-600 text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">
+                    {course.category}
+                  </span>
+                </div>
+              </div>
+
+              {/* Course Info */}
+              <div className="space-y-4">
+                <h3 className="text-2xl font-black text-white leading-tight tracking-tight">{course.title}</h3>
+                <div className="flex items-center gap-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+                  <div className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg">
+                    <Clock size={16} className="text-blue-500" /> <span>{course.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/5 px-2 py-1 rounded-lg">
+                    <Star size={16} className="text-amber-500" /> <span>Yêu thích 98%</span>
+                  </div>
+                </div>
+                <p className="text-slate-400 text-sm leading-relaxed line-clamp-3 font-medium">
+                  {course.description}
+                </p>
+              </div>
+
+              {/* Price section */}
+              <div className="pt-6 border-t border-slate-700/50">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Học phí trọn gói</p>
+                <div className="text-3xl font-black text-blue-500">{course.price}</div>
+              </div>
             </div>
           </div>
         </div>
