@@ -28,6 +28,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'binhminh_secret_key_2025';
 // Default hash for 'admin12345678'
 const ADMIN_PASS_HASH = process.env.ADMIN_PASS_HASH || '$2b$10$zhZP7jreQ35GzJphyIb1PO4FyuJv3bP4NzuQ9ALRXoLVXv6ZhfFpm';
 
+const app = express();
+const PORT = process.env.PORT || 5001;
+
+// Health Checks (EXTREMELY TOP to respond even if DB is slow)
+app.get('/health', (req, res) => res.status(200).send('OK'));
+app.get('/api/health', (req, res) => res.status(200).send('OK'));
+
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -78,8 +85,6 @@ async function migrateDataIfNeeded() {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-const PORT = process.env.PORT || 5001;
 const DB_FILE = path.join(__dirname, 'db.json');
 const UPLOAD_DIR = path.join(__dirname, 'public', 'uploads');
 const PDF_DIR = path.join(__dirname, 'public', 'pdfs');
@@ -87,10 +92,6 @@ const PDF_DIR = path.join(__dirname, 'public', 'pdfs');
 // Ensure directories exist
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 if (!fs.existsSync(PDF_DIR)) fs.mkdirSync(PDF_DIR, { recursive: true });
-
-// Health Checks (Move to top to be ultra-responsive for Render)
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -434,6 +435,6 @@ if (fs.existsSync(DIST_PATH)) {
     });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Backend server running on all interfaces (0.0.0.0) at port ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Backend server running on port ${PORT}`);
 });
