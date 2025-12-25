@@ -2540,7 +2540,7 @@ const ComplianceManager: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8">
               <div className="prose-editor min-h-[300px] mb-12">
                 <ReactQuill
                   theme="snow"

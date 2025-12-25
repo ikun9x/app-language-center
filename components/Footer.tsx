@@ -150,11 +150,11 @@ const Footer: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar">
-              <div className="prose-modern max-w-none">
+            <div className="flex-1 overflow-y-auto p-6 md:p-10">
+              <div className="prose max-w-none break-words">
                 <div
                   dangerouslySetInnerHTML={{ __html: modalType === 'terms' ? state.config.termsOfService || '' : state.config.privacyPolicy || '' }}
-                  className="text-slate-600 font-medium leading-relaxed"
+                  className="text-slate-600 font-medium leading-relaxed whitespace-normal"
                 />
               </div>
             </div>
