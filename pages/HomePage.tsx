@@ -81,25 +81,25 @@ const HomePage: React.FC = () => {
     <main className="overflow-x-hidden pt-24">
       {/* Blog Detail Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center md:p-4">
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedPost(null)} />
-          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
-            <div className="relative h-64 md:h-80 shrink-0">
+          <div className="bg-white w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] md:rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
+            <div className="relative h-64 md:h-96 shrink-0">
               <img src={selectedPost.image} className="w-full h-full object-cover" alt={selectedPost.title} />
               <button
                 onClick={() => setSelectedPost(null)}
-                className="absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-md text-white hover:bg-white hover:text-slate-900 rounded-full transition-all shadow-lg"
+                className="absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-md text-white hover:bg-white hover:text-slate-900 rounded-full transition-all shadow-lg z-10"
               >
                 <X size={24} />
               </button>
             </div>
-            <div className="p-8 md:p-12 overflow-y-auto">
+            <div className="p-6 md:p-12 overflow-y-auto overflow-x-hidden flex-1 no-scrollbar">
               <div className="flex items-center gap-4 mb-6 text-sm text-slate-500 font-bold uppercase tracking-widest">
                 <span className="text-blue-600 font-black">{selectedPost.category}</span>
                 <span>•</span>
                 <span>{selectedPost.date}</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-8 leading-tight">{selectedPost.title}</h2>
+              <h1 className="text-2xl md:text-5xl font-black text-slate-900 mb-8 leading-tight tracking-tight">{selectedPost.title}</h1>
               <div className="prose prose-lg max-w-none text-slate-600 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: selectedPost.content }} />
             </div>
           </div>
@@ -375,34 +375,32 @@ const HomePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="relative group">
-            <div className="flex overflow-x-auto gap-8 pb-8 no-scrollbar scroll-smooth snap-x">
-              {state.blogPosts.map((post) => (
-                <div
-                  key={post.id}
-                  onClick={() => setSelectedPost(post)}
-                  className="min-w-[300px] md:min-w-[400px] snap-start bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-500 cursor-pointer group/card"
-                >
-                  <div className="relative h-60 overflow-hidden">
-                    <img src={post.image} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700" alt={post.title} />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase">
-                        {post.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-8 space-y-4">
-                    <div className="text-slate-400 text-xs font-black tracking-tight">{post.date}</div>
-                    <h3 className="text-xl font-black text-slate-900 group-hover/card:text-blue-600 transition-colors line-clamp-2 leading-snug">
-                      {post.title}
-                    </h3>
-                    <p className="text-slate-500 text-sm leading-relaxed line-clamp-3 font-medium">
-                      {post.summary}
-                    </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {state.blogPosts.map((post) => (
+              <div
+                key={post.id}
+                onClick={() => setSelectedPost(post)}
+                className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-500 cursor-pointer group/card flex flex-col h-full"
+              >
+                <div className="relative h-60 overflow-hidden shrink-0">
+                  <img src={post.image} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700" alt={post.title} />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase">
+                      {post.category}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="p-8 space-y-4 flex-1 flex flex-col">
+                  <div className="text-slate-400 text-xs font-black tracking-tight">{post.date}</div>
+                  <h3 className="text-xl font-black text-slate-900 group-hover/card:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed line-clamp-3 font-medium flex-1">
+                    {post.summary}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
