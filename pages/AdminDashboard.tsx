@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useApp, API_BASE_URL } from '../constants';
+import { useApp, API_BASE_URL, INITIAL_CONFIG } from '../constants';
 import { getAssetPath } from '../utils';
 import { toast } from 'react-toastify';
 import {
@@ -2510,12 +2510,25 @@ const ComplianceManager: React.FC = () => {
                   <Clock size={14} /> Tự động lưu bản nháp vào bộ nhớ tạm
                 </p>
               </div>
-              <button
-                onClick={() => setShowEditor(false)}
-                className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
-              >
-                <X size={24} />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => {
+                    if (window.confirm('Hành động này sẽ thay thế nội dung hiện tại bằng mẫu gợi ý chuyên nghiệp. Bạn có chắc chắn?')) {
+                      setLocalContent(editorType === 'terms' ? (INITIAL_CONFIG.termsOfService || '') : (INITIAL_CONFIG.privacyPolicy || ''));
+                      toast.info('Đã áp dụng mẫu gợi ý mới!');
+                    }
+                  }}
+                  className="flex items-center gap-2 bg-amber-50 text-amber-600 font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-100 transition shadow-sm border border-amber-100"
+                >
+                  <Sparkles size={14} /> Dùng mẫu gợi ý
+                </button>
+                <button
+                  onClick={() => setShowEditor(false)}
+                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-8">

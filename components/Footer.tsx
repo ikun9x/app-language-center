@@ -14,6 +14,14 @@ const Footer: React.FC = () => {
     setShowModal(true);
   };
 
+  const scrollToContact = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-24 pb-12 overflow-hidden relative">
       {/* Decorative background element */}
@@ -103,7 +111,7 @@ const Footer: React.FC = () => {
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mt-6 md:mt-0">
           <button onClick={() => openModal('terms')} className="hover:text-blue-500 transition-colors">Điều khoản</button>
           <button onClick={() => openModal('privacy')} className="hover:text-blue-500 transition-colors">Bảo mật</button>
-          <a href="#" className="hover:text-blue-500 transition-colors">Hỗ trợ</a>
+          <button onClick={scrollToContact} className="hover:text-blue-500 transition-colors">Hỗ trợ</button>
           {state.config.authorUrl && (
             <a
               href={state.config.authorUrl}
