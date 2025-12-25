@@ -87,6 +87,7 @@ export interface SiteConfig {
   statsSatisfaction?: string;
   privacyPolicy?: string;
   termsOfService?: string;
+  authorUrl?: string;
 }
 
 export interface Testimonial {

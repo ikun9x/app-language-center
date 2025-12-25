@@ -1,11 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../constants';
 import { getAssetPath } from '../utils';
-import { MapPin, Phone, Mail, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { MapPin, Phone, Mail, CheckCircle2, ShieldCheck, X, FileText, Shield } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const { state } = useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'privacy' | 'terms'>('privacy');
+
+  const openModal = (type: 'privacy' | 'terms') => {
+    setModalType(type);
+    setShowModal(true);
+  };
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-24 pb-12 overflow-hidden relative">
@@ -31,8 +38,9 @@ const Footer: React.FC = () => {
             Hệ thống đào tạo ngôn ngữ chất lượng cao tại Cần Đước, Tây Ninh. Đồng hành cùng bạn trên con đường chinh phục tiếng Anh.
           </p>
           <div className="flex space-x-4">
-            {/* Social mock buttons */}
-            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg font-black text-sm">f</div>
+            {state.config.facebook && (
+              <a href={state.config.facebook} target="_blank" className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg font-black text-sm">f</a>
+            )}
             <a href={`https://zalo.me/${state.config.zalo}`} target="_blank" className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all transform hover:-translate-y-1 cursor-pointer shadow-lg">
               <img src={getAssetPath("/images/zalo.png")} className="w-6 h-6 object-contain rounded-md" alt="Zalo" />
             </a>
@@ -72,15 +80,15 @@ const Footer: React.FC = () => {
               <CheckCircle2 size={16} className="text-blue-500" />
               <span className="text-slate-300">Đại diện: {state.config.representative}</span>
             </p>
-            <p className="text-slate-400 pl-7">Thành lập: {state.config.foundingDate}</p>
-            <p className="text-slate-500 italic pl-7 opacity-60 leading-relaxed">Phục vụ công tác thanh tra, kiểm tra theo quy định.</p>
+            <p className="text-slate-400 pl-7 text-[10px]">Thành lập: {state.config.foundingDate}</p>
+            <p className="text-slate-500 italic pl-7 opacity-60 leading-relaxed text-[10px]">Phục vụ công tác thanh tra, kiểm tra theo quy định.</p>
           </div>
         </div>
       </div>
 
       {/* Full-width Map Section */}
-      <div className="mt-5 relative z-10 w-full">
-        <div className="h-[576px] bg-slate-800 shadow-2xl overflow-hidden border-y border-slate-800/50">
+      <div className="mt-16 relative z-10 w-full">
+        <div className="h-[400px] bg-slate-800 shadow-2xl overflow-hidden border-y border-slate-800/50">
           <iframe
             src={state.config.googleMapsEmbed}
             className="w-full h-full border-0"
@@ -90,14 +98,68 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-5 pt-5 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+      <div className="max-w-7xl mx-auto px-6 mt-10 pt-10 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
         <p className="text-center md:text-left">&copy; 2025 TRUNG TÂM NGOẠI NGỮ {state.config.brandNamePrincipal}. CHÍNH TRỰC - TẬN TÂM.</p>
-        <div className="flex space-x-8 mt-6 md:mt-0">
-          <a href="#" className="hover:text-blue-500 transition-colors">Điều khoản</a>
-          <a href="#" className="hover:text-blue-500 transition-colors">Bảo mật</a>
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mt-6 md:mt-0">
+          <button onClick={() => openModal('terms')} className="hover:text-blue-500 transition-colors">Điều khoản</button>
+          <button onClick={() => openModal('privacy')} className="hover:text-blue-500 transition-colors">Bảo mật</button>
           <a href="#" className="hover:text-blue-500 transition-colors">Hỗ trợ</a>
+          {state.config.authorUrl && (
+            <a
+              href={state.config.authorUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1 bg-slate-800 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-blue-400"
+            >
+              Tác giả
+            </a>
+          )}
         </div>
       </div>
+
+      {/* Legal Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
+          <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-[2.5rem] shadow-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                  {modalType === 'terms' ? <FileText size={24} /> : <Shield size={24} />}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">
+                    {modalType === 'terms' ? 'Điều Khoản Dịch Vụ' : 'Chính Sách Bảo Mật'}
+                  </h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{state.config.brandNamePrincipal} Language Center</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all border border-slate-200 hover:scale-110 active:scale-95 shadow-sm"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-10 prose-modern">
+              <div
+                dangerouslySetInnerHTML={{ __html: modalType === 'terms' ? state.config.termsOfService || '' : state.config.privacyPolicy || '' }}
+                className="text-slate-600 font-medium leading-relaxed"
+              />
+            </div>
+
+            <div className="p-8 bg-slate-50/50 border-t text-center">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-slate-900 text-white font-black px-10 py-4 rounded-2xl hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+              >
+                ĐÃ HIỂU VÀ ĐỒNG Ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 };

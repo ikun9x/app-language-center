@@ -555,6 +555,17 @@ const ContentManager: React.FC = () => {
                 <input className="w-full p-4 bg-slate-50 rounded-xl outline-none text-xs" value={localConfig.messenger || ''} onChange={e => setLocalConfig({ ...localConfig, messenger: e.target.value })} placeholder="https://m.me/username" />
               </div>
             </div>
+            <div className="border-t pt-4">
+              <label className="block text-xs font-bold text-blue-600 mb-2 flex items-center gap-2">
+                <Globe size={14} /> Link portfolio tác giả (Footer)
+              </label>
+              <input
+                className="w-full p-4 bg-blue-50/50 rounded-xl outline-none text-xs border border-blue-100"
+                value={localConfig.authorUrl || ''}
+                onChange={e => setLocalConfig({ ...localConfig, authorUrl: e.target.value })}
+                placeholder="https://your-portfolio.com"
+              />
+            </div>
           </div>
         </div>
 

@@ -56,8 +56,55 @@ export const INITIAL_CONFIG: SiteConfig = {
   statsTeachers: "50+",
   statsCourses: "20+",
   statsSatisfaction: "98%",
-  privacyPolicy: "<h3>Chính sách bảo mật</h3><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>",
-  termsOfService: "<h3>Điều khoản dịch vụ</h3><p>Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý với...</p>"
+  privacyPolicy: `
+    <h1 style="color: #1e293b; font-size: 24px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px;">Chính Sách Bảo Mật Thông Tin</h1>
+    <p>Chào mừng bạn đến với <strong>Trung tâm Ngoại ngữ Bình Minh</strong>. Chúng tôi coi trọng quyền riêng tư của bạn và cam kết bảo vệ thông tin cá nhân của người dùng.</p>
+    
+    <h3 style="color: #2563eb; margin-top: 25px;">1. Thu thập thông tin</h3>
+    <p>Chúng tôi thu thập thông tin khi bạn đăng ký tư vấn hoặc gửi tin nhắn thông qua website, bao gồm:</p>
+    <ul>
+      <li>Họ và tên</li>
+      <li>Số điện thoại</li>
+      <li>Địa chỉ Email</li>
+      <li>Nhu cầu học tập cụ thể</li>
+    </ul>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">2. Mục đích sử dụng</h3>
+    <p>Thông tin của bạn sẽ được sử dụng vào các mục đích sau:</p>
+    <ul>
+      <li>Tư vấn lộ trình học và học phí phù hợp.</li>
+      <li>Gửi thông báo về lịch khai giảng và các chương trình ưu đãi.</li>
+      <li>Cải thiện chất lượng dịch vụ chăm sóc khách hàng.</li>
+    </ul>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">3. Bảo mật thông tin</h3>
+    <p>Chúng tôi triển khai các biện pháp an ninh tối đa để bảo vệ thông tin cá nhân của bạn. Dữ liệu chỉ được truy cập bởi nhân viên có thẩm quyền và tuyệt đối không chia sẻ cho bên thứ ba vì mục đích thương mại.</p>
+    
+    <h3 style="color: #2563eb; margin-top: 25px;">4. Quyền lợi của bạn</h3>
+    <p>Bạn có quyền yêu cầu chỉnh sửa hoặc xóa bỏ thông tin cá nhân của mình khỏi hệ thống của chúng tôi bất cứ lúc nào bằng cách liên hệ qua Hotline hoặc Email chính thức.</p>
+  `,
+  termsOfService: `
+    <h1 style="color: #1e293b; font-size: 24px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px;">Điều Khoản Dịch Vụ & Quy Định Chung</h1>
+    
+    <h3 style="color: #2563eb; margin-top: 25px;">1. Quy định về Đăng ký & Nhập học</h3>
+    <p>Học viên cần cung cấp thông tin chính xác khi đăng ký khóa học. Các tài liệu học tập được cấp phát chỉ dành riêng cho học viên của trung tâm và không được sao chép, phát tán dưới bất kỳ hình thức nào.</p>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">2. Chính sách Học phí</h3>
+    <ul>
+      <li>Học phí cần được hoàn thành đúng hạn trước ngày khai giảng để đảm bảo vị trí lớp học.</li>
+      <li>Trung tâm có chính sách bảo lưu học phí trong trường hợp học viên có lý do bất khả kháng (có minh chứng cụ thể).</li>
+    </ul>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">3. Nội quy Lớp học</h3>
+    <p>Học viên cần tuân thủ giờ giấc và quy định về trang phục, hành xử tại trung tâm. Việc nghỉ học cần được thông báo trước tối thiểu 24 giờ để được hỗ trợ tài liệu hoặc học bù nếu có lớp tương đương.</p>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">4. Trách nhiệm & Cam kết</h3>
+    <p>Trung tâm cam kết chất lượng đào tạo theo đúng lộ trình đã tư vấn. Học viên cần chủ động học tập và làm bài đầy đủ để đạt được kết quả đầu ra tốt nhất.</p>
+
+    <h3 style="color: #2563eb; margin-top: 25px;">5. Thay đổi điều khoản</h3>
+    <p>Các điều khoản này có thể được cập nhật để phù hợp với quy định của pháp luật và nhu cầu thực tế. Mọi thay đổi sẽ được thông báo công khai trên website chính thức.</p>
+  `,
+  authorUrl: "https://your-portfolio-link.com"
 };
 
 export const INITIAL_COURSES: Course[] = [
