@@ -148,12 +148,19 @@ const App: React.FC = () => {
     saveData();
   }, [state, loading]);
 
-  // Update Favicon and Title
+  // Update Favicon, Title and Meta Tags for SEO
   useEffect(() => {
+    // 1. Update Title
     if (state.config.brandNamePrincipal) {
-      document.title = `${state.config.brandNamePrincipal} - ${state.config.brandNameSub || 'Language Center'}`;
+      const fullTitle = state.config.seoTitle || `${state.config.brandNamePrincipal} - ${state.config.brandNameSub || 'Language Center'}`;
+      document.title = fullTitle;
+
+      // Update OG Title
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', fullTitle);
     }
 
+    // 2. Update Favicon
     if (state.config.brandLogoImage) {
       let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
       if (!link) {
@@ -162,8 +169,38 @@ const App: React.FC = () => {
         document.getElementsByTagName('head')[0].appendChild(link);
       }
       link.href = state.config.brandLogoImage;
+
+      // Update OG Image
+      const ogImage = document.querySelector('meta[property="og:image"]');
+      if (ogImage) ogImage.setAttribute('content', state.config.brandLogoImage);
     }
-  }, [state.config.brandLogoImage, state.config.brandNamePrincipal, state.config.brandNameSub]);
+
+    // 3. Update Meta Description
+    if (state.config.seoDescription) {
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', state.config.seoDescription);
+      }
+
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', state.config.seoDescription);
+    }
+
+    // 4. Update Meta Keywords
+    if (state.config.seoKeywords) {
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', state.config.seoKeywords);
+      }
+    }
+  }, [
+    state.config.brandLogoImage,
+    state.config.brandNamePrincipal,
+    state.config.brandNameSub,
+    state.config.seoTitle,
+    state.config.seoDescription,
+    state.config.seoKeywords
+  ]);
 
   const updateState = (newState: Partial<AppState>) => {
     setState(prev => ({ ...prev, ...newState }));

@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
           <div className="flex flex-col">
-            <h1 className="text-slate-900 font-extrabold text-lg leading-none tracking-tight">{state.config.brandNamePrincipal}</h1>
+            <div className="text-slate-900 font-extrabold text-lg leading-none tracking-tight">{state.config.brandNamePrincipal}</div>
             <p className="text-[10px] text-blue-600 font-bold tracking-[0.2em] uppercase mt-1">{state.config.brandNameSub}</p>
           </div>
         </Link>
