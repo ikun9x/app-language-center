@@ -148,15 +148,15 @@ const HomePage: React.FC = () => {
               <img src={getAssetPath("/assets/3d/book.png")} className="w-full h-full object-contain" alt="3D Book" />
             </div>
 
-            <div className="absolute top-10 right-4 w-20 h-20 md:w-44 md:h-44 animate-float-delayed opacity-100 select-none z-50">
+            <div className="absolute top-10 right-4 lg:top-12 lg:right-1/4 w-20 h-20 md:w-36 md:h-36 lg:w-44 lg:h-44 animate-float-delayed opacity-100 select-none z-50">
               <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
             </div>
 
-            <div className="absolute bottom-10 left-0 w-24 h-24 md:w-36 md:h-36 animate-float-slow opacity-100 select-none z-50">
+            <div className="absolute bottom-60 left-6 lg:bottom-12 lg:right-[52%] lg:left-auto w-24 h-24 md:w-36 md:h-36 animate-float-slow opacity-100 select-none z-50">
               <img src={getAssetPath("/assets/3d/cap.png")} className="w-full h-full object-contain" alt="3D Graduation Cap" />
             </div>
 
-            <div className="absolute top-10 left-10 w-16 h-16 md:w-44 md:h-44 animate-float-delayed opacity-100 select-none z-50">
+            <div className="absolute top-10 left-12 lg:top-12 lg:right-[58%] lg:left-auto w-16 h-16 md:w-36 md:h-36 lg:w-44 lg:h-44 animate-float-delayed opacity-100 select-none z-50">
               <img src={getAssetPath("/assets/3d/crown.png")} className="w-full h-full object-contain" alt="crown" />
             </div>
 
