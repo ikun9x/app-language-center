@@ -152,11 +152,11 @@ const HomePage: React.FC = () => {
               <img src={getAssetPath("/assets/3d/laptop.png")} className="w-full h-full object-contain" alt="3D Laptop" />
             </div>
 
-            <div className="absolute bottom-10 left-4 w-24 h-24 md:w-36 md:h-36 animate-float-slow opacity-100 select-none z-50">
+            <div className="absolute bottom-10 left-0 w-24 h-24 md:w-36 md:h-36 animate-float-slow opacity-100 select-none z-50">
               <img src={getAssetPath("/assets/3d/cap.png")} className="w-full h-full object-contain" alt="3D Graduation Cap" />
             </div>
 
-            <div className="absolute top-1/4 -left-4 w-16 h-16 md:w-44 md:h-44 animate-float-delayed opacity-100 select-none z-50">
+            <div className="absolute top-10 left-10 w-16 h-16 md:w-44 md:h-44 animate-float-delayed opacity-100 select-none z-50">
               <img src={getAssetPath("/assets/3d/crown.png")} className="w-full h-full object-contain" alt="crown" />
             </div>
 
