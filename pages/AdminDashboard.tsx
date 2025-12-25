@@ -37,7 +37,7 @@ import {
   Star,
   Lock,
   Shield,
-  X
+  Sparkles
 } from 'lucide-react';
 const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
