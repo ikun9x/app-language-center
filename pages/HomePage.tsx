@@ -106,7 +106,7 @@ const HomePage: React.FC = () => {
         </div>
       )}
       {/* Hero Section */}
-      <section className="relative pt-12 md:pt-20 pb-16 md:pb-24 px-4 md:px-6">
+      <section className="relative pt-12 pb-16 md:pb-20 px-4 md:px-6">
         <div className="max-w-7xl mx-auto w-full relative">
           <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-[3.5rem] p-10 py-16 md:py-20 overflow-hidden relative shadow-2xl 
           shadow-blue-900/40 min-h-[450px] flex flex-col justify-center">
@@ -900,11 +900,5 @@ const CourseDetailModal: React.FC<{ course: any, onClose: () => void }> = ({ cou
   );
 };
 
-const X: React.FC<{ size?: number }> = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
 
 export default HomePage;
