@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed w-full z-50 px-6 py-4 transition-all duration-300">
+    <nav className="fixed w-full z-[100] px-6 py-4 transition-all duration-300">
       <div className="max-w-7xl mx-auto glass rounded-2xl shadow-lg px-8 py-3 flex justify-between items-center transition-all hover:shadow-xl border border-white/20">
         <Link to="/" className="flex items-center space-x-3 group">
           <div className={state.config.brandLogoImage ? "" : "bg-gradient-to-br from-blue-600 to-indigo-600 p-2.5 rounded-xl text-white font-black text-xl shadow-lg shadow-blue-500/30 transition-transform group-hover:scale-110 group-hover:rotate-6"}>
