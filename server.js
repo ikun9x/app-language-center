@@ -79,7 +79,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 const DB_FILE = path.join(__dirname, 'db.json');
 const UPLOAD_DIR = path.join(__dirname, 'public', 'uploads');
 const PDF_DIR = path.join(__dirname, 'public', 'pdfs');
@@ -131,6 +131,11 @@ const writeDB = (data) => {
     }
 };
 
+// Rate limiting / Lockout Store (In-memory)
+const loginAttempts = new Map();
+const LOCKOUT_TIME = 5 * 60 * 1000; // 5 minutes
+const MAX_ATTEMPTS = 5;
+
 // Auth Middleware
 const authenticate = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
@@ -146,16 +151,38 @@ const authenticate = (req, res, next) => {
 // Endpoints
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
+    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+
+    // Check lockout
+    const attempt = loginAttempts.get(ip) || { count: 0, lastAttempt: 0 };
+    const now = Date.now();
+
+    if (attempt.count >= MAX_ATTEMPTS && (now - attempt.lastAttempt) < LOCKOUT_TIME) {
+        const remaining = Math.ceil((LOCKOUT_TIME - (now - attempt.lastAttempt)) / 60000);
+        return res.status(429).json({
+            error: `Tài khoản tạm thời bị khóa do đăng nhập sai nhiều lần. Vui lòng thử lại sau ${remaining} phút.`
+        });
+    }
 
     // For now, only one admin account
     const validUser = 'admin';
 
     if (username === validUser && await bcrypt.compare(password, ADMIN_PASS_HASH)) {
+        // Success: Clear attempts
+        loginAttempts.delete(ip);
         const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
         return res.json({ success: true, token });
     }
 
-    res.status(401).json({ error: 'Username hoặc mật khẩu không chính xác' });
+    // Failure: Increase count
+    const newCount = (now - attempt.lastAttempt) > LOCKOUT_TIME ? 1 : attempt.count + 1;
+    loginAttempts.set(ip, { count: newCount, lastAttempt: now });
+
+    res.status(401).json({
+        error: newCount >= MAX_ATTEMPTS
+            ? 'Đã thử quá 5 lần. Tài khoản sẽ bị khóa trong 5 phút.'
+            : 'Username hoặc mật khẩu không chính xác'
+    });
 });
 app.get('/api/data', async (req, res) => {
     // 1. Try MongoDB if connected
