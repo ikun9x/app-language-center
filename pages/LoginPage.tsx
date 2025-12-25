@@ -7,7 +7,7 @@ import { Lock, User, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const LoginPage: React.FC = () => {
-  const { state, updateState } = useApp();
+  const { state, updateState, apiBaseUrl } = useApp();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -33,7 +33,7 @@ const LoginPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${state.apiBaseUrl || API_BASE_URL}/api/login`, {
+      const res = await fetch(`${apiBaseUrl}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pass })
