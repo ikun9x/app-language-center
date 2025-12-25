@@ -30,24 +30,37 @@ const LoginPage: React.FC = () => {
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (user === 'admin' && pass === '12345678') {
-      if (remember) {
-        localStorage.setItem('bm_admin_cred', JSON.stringify({ user, pass }));
-      } else {
-        localStorage.removeItem('bm_admin_cred');
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-      updateState({
-        isAuthenticated: true,
-        lastLoginDay: today
+    try {
+      const res = await fetch(`${state.apiBaseUrl || API_BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
       });
-      toast.success('Đăng nhập thành công!');
-      navigate('/admin');
-    } else {
-      toast.error('Tài khoản hoặc mật khẩu không chính xác');
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        if (remember) {
+          localStorage.setItem('bm_admin_token', data.token);
+          localStorage.setItem('bm_admin_user', user);
+        } else {
+          sessionStorage.setItem('bm_admin_token', data.token);
+          localStorage.removeItem('bm_admin_token');
+          localStorage.removeItem('bm_admin_user');
+        }
+
+        updateState({
+          isAuthenticated: true
+        });
+        toast.success('Đăng nhập thành công!');
+        navigate('/admin');
+      } else {
+        toast.error(data.error || 'Tài khoản hoặc mật khẩu không chính xác');
+      }
+    } catch (err) {
+      toast.error('Không thể kết nối tới máy chủ');
     }
   };
 

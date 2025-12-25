@@ -7,6 +7,8 @@ import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();
@@ -21,6 +23,10 @@ cloudinary.config({
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
     console.warn(">>> WARNING: Cloudinary credentials missing. File uploads will not work.");
 }
+
+const JWT_SECRET = process.env.JWT_SECRET || 'binhminh_secret_key_2025';
+// Default hash for 'admin12345678'
+const ADMIN_PASS_HASH = process.env.ADMIN_PASS_HASH || '$2b$10$zhZP7jreQ35GzJphyIb1PO4FyuJv3bP4NzuQ9ALRXoLVXv6ZhfFpm';
 
 // --- MongoDB Connection ---
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -125,7 +131,32 @@ const writeDB = (data) => {
     }
 };
 
+// Auth Middleware
+const authenticate = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized: No token provided' });
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        req.user = decoded;
+        next();
+    });
+};
+
 // Endpoints
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    // For now, only one admin account
+    const validUser = 'admin';
+
+    if (username === validUser && await bcrypt.compare(password, ADMIN_PASS_HASH)) {
+        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+        return res.json({ success: true, token });
+    }
+
+    res.status(401).json({ error: 'Username hoặc mật khẩu không chính xác' });
+});
 app.get('/api/data', async (req, res) => {
     // 1. Try MongoDB if connected
     if (mongoose.connection.readyState === 1) {
@@ -146,7 +177,7 @@ app.get('/api/data', async (req, res) => {
     res.json({ ...data, _storage: 'file' });
 });
 
-app.post('/api/data', async (req, res) => {
+app.post('/api/data', authenticate, async (req, res) => {
     // 1. Mandatory MongoDB if URI is present
     if (process.env.MONGODB_URI) {
         if (mongoose.connection.readyState === 1) {
@@ -183,7 +214,7 @@ app.post('/api/data', async (req, res) => {
     }
 });
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/upload', authenticate, upload.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const stream = cloudinary.uploader.upload_stream(
@@ -196,7 +227,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     stream.end(req.file.buffer);
 });
 
-app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
+app.post('/api/upload-pdf', authenticate, uploadPdf.single('file'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const originalName = req.file.originalname;
@@ -236,7 +267,7 @@ app.post('/api/upload-pdf', uploadPdf.single('file'), (req, res) => {
     stream.end(req.file.buffer);
 });
 
-app.delete('/api/delete-file', async (req, res) => {
+app.delete('/api/delete-file', authenticate, async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
 
@@ -295,7 +326,7 @@ app.delete('/api/delete-file', async (req, res) => {
 });
 
 // --- Garbage Collector ---
-app.get('/api/garbage-collector', (req, res) => {
+app.get('/api/garbage-collector', authenticate, (req, res) => {
     try {
         const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
         const usedFiles = new Set();

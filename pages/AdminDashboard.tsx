@@ -48,9 +48,13 @@ const deletePhysicalFile = async (url?: string) => {
   if (!isLocal && !isCloud) return;
 
   try {
+    const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
     await fetch(`${API_BASE_URL}/api/delete-file`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({ url }),
     });
   } catch (err) {
@@ -75,6 +79,9 @@ const AdminDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
+    localStorage.removeItem('bm_admin_token');
+    sessionStorage.removeItem('bm_admin_token');
+    localStorage.removeItem('bm_admin_user');
     updateState({ isAuthenticated: false });
     navigate('/');
   };
@@ -322,8 +329,10 @@ const ContentManager: React.FC = () => {
         await deletePhysicalFile(localConfig.brandLogoImage);
       }
 
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
       const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       });
       const data = await res.json();
@@ -341,9 +350,13 @@ const ContentManager: React.FC = () => {
     if (!confirm("Bạn có chắc chắn muốn xoá logo này khỏi máy chủ?")) return;
 
     try {
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
       const res = await fetch(`${API_BASE_URL}/api/delete-file`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ url: localConfig.brandLogoImage }),
       });
       const data = await res.json();
@@ -951,8 +964,10 @@ const CourseModal: React.FC<{ course: any, onClose: () => void, onSave: (data: a
         await deletePhysicalFile(formData.image);
       }
 
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
       const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formDataUpload,
       });
       const data = await res.json();
@@ -1376,8 +1391,10 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
         await deletePhysicalFile(formData.image);
       }
 
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
       const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formDataUpload,
       });
       const data = await res.json();
@@ -1872,7 +1889,12 @@ const TestimonialModal = ({ testimonial, onClose, onSave }: { testimonial: Testi
     data.append('file', file);
     try {
       if (formData.image) await deletePhysicalFile(formData.image);
-      const res = await fetch(`${API_BASE_URL}/api/upload`, { method: 'POST', body: data });
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data
+      });
       const { url } = await res.json();
       if (url) setFormData({ ...formData, image: url });
     } catch (err) {
@@ -2006,8 +2028,10 @@ const DocumentsManager = () => {
     formData.append('file', file);
 
     try {
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
       const response = await fetch(`${API_BASE_URL}/api/upload-pdf`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       });
       if (response.ok) {
@@ -2218,7 +2242,10 @@ const SystemOptimizer: React.FC = () => {
   const scanForGarbage = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/garbage-collector`);
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/garbage-collector`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       setJunkFiles(data.files);
       setScanned(true);
@@ -2234,7 +2261,10 @@ const SystemOptimizer: React.FC = () => {
     if (!window.confirm(`Bạn có chắc muốn xóa ${junkFiles.length} tệp này?`)) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/garbage-collector?action=delete`);
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/garbage-collector?action=delete`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       if (data.success) {
         toast.success(`Đã xóa thành công ${data.deleted} tệp rác`);
@@ -2420,7 +2450,12 @@ const BlogPostsManager: React.FC = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/upload`, { method: 'POST', body: formData });
+      const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
       const data = await res.json();
       if (data.url) setLocalPost({ ...localPost, image: data.url });
     } catch (err) {

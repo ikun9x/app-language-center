@@ -49,8 +49,8 @@ const App: React.FC = () => {
           if (!data.testimonials || data.testimonials.length === 0) data.testimonials = INITIAL_TESTIMONIALS;
           if (!data.blogPosts) data.blogPosts = INITIAL_BLOG_POSTS;
 
-          const adminCred = localStorage.getItem('bm_admin_cred');
-          setState({ ...data, isAuthenticated: !!adminCred });
+          const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+          setState({ ...data, isAuthenticated: !!token });
           localStorage.setItem('bm_center_data', JSON.stringify(data));
           return;
         }
@@ -59,7 +59,7 @@ const App: React.FC = () => {
         const savedData = localStorage.getItem('bm_center_data');
         if (savedData) {
           const parsed = JSON.parse(savedData);
-          const adminCred = localStorage.getItem('bm_admin_cred');
+          const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
 
           // Migration: Merge missing config properties from defaults (e.g. googleMapsEmbed)
           if (parsed.config) {
@@ -78,10 +78,10 @@ const App: React.FC = () => {
             parsed.blogPosts = INITIAL_BLOG_POSTS;
           }
 
-          setState({ ...parsed, isAuthenticated: !!adminCred });
+          setState({ ...parsed, isAuthenticated: !!token });
         } else {
           // No saved data at all, use seeded defaults
-          const adminCred = localStorage.getItem('bm_admin_cred');
+          const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
           setState({
             categories: INITIAL_CATEGORIES,
             teachers: INITIAL_TEACHERS,
@@ -92,7 +92,7 @@ const App: React.FC = () => {
             publicDocuments: INITIAL_DOCUMENTS,
             testimonials: INITIAL_TESTIMONIALS,
             blogPosts: INITIAL_BLOG_POSTS,
-            isAuthenticated: !!adminCred
+            isAuthenticated: !!token
           });
         }
       } finally {
@@ -121,11 +121,25 @@ const App: React.FC = () => {
       }));
 
       try {
-        await fetch(`${API_BASE_URL}/api/data`, {
+        const token = localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token');
+        if (!token) return; // Don't try to save to API if not authenticated
+
+        const res = await fetch(`${API_BASE_URL}/api/data`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(state)
         });
+
+        if (res.status === 401) {
+          // Token expired or invalid
+          localStorage.removeItem('bm_admin_token');
+          sessionStorage.removeItem('bm_admin_token');
+          setState(prev => ({ ...prev, isAuthenticated: false }));
+          toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+        }
       } catch (err) {
         // Silently fail API save as we already saved to localStorage
         console.debug("Backend save failed, using local storage only.");
