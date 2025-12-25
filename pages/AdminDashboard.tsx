@@ -2499,18 +2499,27 @@ const ComplianceManager: React.FC = () => {
 
       {/* Content Editor Modal */}
       {showEditor && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[3rem] shadow-2xl flex flex-col overflow-hidden">
-            <div className="p-8 border-b flex justify-between items-center bg-slate-50">
-              <div>
-                <h3 className="text-2xl font-black text-slate-900">
-                  {editorType === 'terms' ? 'Chỉnh sửa Điều khoản dịch vụ' : 'Chỉnh sửa Chính sách bảo mật'}
-                </h3>
-                <p className="text-sm text-slate-500 flex items-center gap-1">
-                  <Clock size={14} /> Tự động lưu bản nháp vào bộ nhớ tạm
-                </p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center md:p-4">
+          <div className="bg-white w-full h-full md:h-auto md:max-w-4xl md:max-h-[90vh] md:rounded-[3rem] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-6 md:p-8 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50">
+              <div className="flex items-center justify-between md:justify-start gap-4">
+                <div>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+                    {editorType === 'terms' ? 'Chỉnh sửa Điều khoản' : 'Chỉnh sửa Bảo mật'}
+                  </h3>
+                  <p className="text-[10px] md:text-sm text-slate-500 flex items-center gap-1">
+                    <Clock size={14} /> Tự động lưu bản nháp
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowEditor(false)}
+                  className="md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
+                >
+                  <X size={20} />
+                </button>
               </div>
-              <div className="flex items-center gap-4">
+
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
                     if (window.confirm('Hành động này sẽ thay thế nội dung hiện tại bằng mẫu gợi ý chuyên nghiệp. Bạn có chắc chắn?')) {
@@ -2518,21 +2527,21 @@ const ComplianceManager: React.FC = () => {
                       toast.info('Đã áp dụng mẫu gợi ý mới!');
                     }
                   }}
-                  className="flex items-center gap-2 bg-amber-50 text-amber-600 font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-100 transition shadow-sm border border-amber-100"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-amber-50 text-amber-600 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-amber-100 transition shadow-sm border border-amber-100"
                 >
                   <Sparkles size={14} /> Dùng mẫu gợi ý
                 </button>
                 <button
                   onClick={() => setShowEditor(false)}
-                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
+                  className="hidden md:flex w-12 h-12 bg-white rounded-full items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
                 >
                   <X size={24} />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8">
-              <div className="prose-editor min-h-[400px]">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar">
+              <div className="prose-editor min-h-[300px] mb-12">
                 <ReactQuill
                   theme="snow"
                   value={localContent}
@@ -2540,23 +2549,23 @@ const ComplianceManager: React.FC = () => {
                   modules={quillModules}
                   formats={quillFormats}
                   placeholder="Bắt đầu nhập nội dung pháp lý tại đây..."
-                  className="h-[350px] mb-12"
+                  className="h-full"
                 />
               </div>
             </div>
 
-            <div className="p-8 border-t bg-slate-50 flex gap-4">
+            <div className="p-6 md:p-8 border-t bg-slate-50 flex gap-4">
               <button
                 onClick={() => setShowEditor(false)}
-                className="flex-1 py-4 text-slate-500 font-bold hover:bg-white rounded-2xl transition"
+                className="flex-1 py-4 text-slate-500 font-bold hover:bg-white rounded-2xl transition text-sm"
               >
                 Hủy bỏ
               </button>
               <button
                 onClick={handleSaveContent}
-                className="flex-[2] bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition flex items-center justify-center gap-2"
+                className="flex-[2] bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition flex items-center justify-center gap-2 text-sm"
               >
-                <Save size={20} /> Lưu & Xuất bản ngay
+                <Save size={18} /> Lưu & Xuất bản
               </button>
             </div>
           </div>

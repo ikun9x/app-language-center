@@ -127,42 +127,44 @@ const Footer: React.FC = () => {
 
       {/* Legal Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center md:p-4">
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
-          <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-[2.5rem] shadow-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
+          <div className="bg-white w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] md:rounded-[2.5rem] shadow-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-6 md:p-8 border-b flex justify-between items-center bg-slate-50/50 text-sans">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                  {modalType === 'terms' ? <FileText size={24} /> : <Shield size={24} />}
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                  {modalType === 'terms' ? <FileText size={20} className="md:w-6 md:h-6" /> : <Shield size={20} className="md:w-6 md:h-6" />}
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">
                     {modalType === 'terms' ? 'Điều Khoản Dịch Vụ' : 'Chính Sách Bảo Mật'}
                   </h3>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{state.config.brandNamePrincipal} Language Center</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">{state.config.brandNamePrincipal}</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all border border-slate-200 hover:scale-110 active:scale-95 shadow-sm"
+                className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all border border-slate-200 hover:scale-110 active:scale-95 shadow-sm"
               >
-                <X size={24} />
+                <X size={20} className="md:w-6 md:h-6" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-10 prose-modern">
-              <div
-                dangerouslySetInnerHTML={{ __html: modalType === 'terms' ? state.config.termsOfService || '' : state.config.privacyPolicy || '' }}
-                className="text-slate-600 font-medium leading-relaxed"
-              />
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar">
+              <div className="prose-modern max-w-none">
+                <div
+                  dangerouslySetInnerHTML={{ __html: modalType === 'terms' ? state.config.termsOfService || '' : state.config.privacyPolicy || '' }}
+                  className="text-slate-600 font-medium leading-relaxed"
+                />
+              </div>
             </div>
 
-            <div className="p-8 bg-slate-50/50 border-t text-center">
+            <div className="p-6 md:p-8 bg-slate-50/50 border-t text-center">
               <button
                 onClick={() => setShowModal(false)}
-                className="bg-slate-900 text-white font-black px-10 py-4 rounded-2xl hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+                className="w-full md:w-auto bg-slate-900 text-white font-black px-10 py-4 rounded-2xl hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 active:scale-95 text-sm"
               >
-                ĐÃ HIỂU VÀ ĐỒNG Ý
+                TÔI ĐÃ ĐỌC VÀ ĐỒNG Ý
               </button>
             </div>
           </div>
