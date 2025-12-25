@@ -88,6 +88,10 @@ const PDF_DIR = path.join(__dirname, 'public', 'pdfs');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 if (!fs.existsSync(PDF_DIR)) fs.mkdirSync(PDF_DIR, { recursive: true });
 
+// Health Checks (Move to top to be ultra-responsive for Render)
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(UPLOAD_DIR));
@@ -149,10 +153,6 @@ const authenticate = (req, res, next) => {
 };
 
 // Endpoints
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
