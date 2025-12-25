@@ -55,7 +55,9 @@ export const INITIAL_CONFIG: SiteConfig = {
   statsYears: "10+",
   statsTeachers: "50+",
   statsCourses: "20+",
-  statsSatisfaction: "98%"
+  statsSatisfaction: "98%",
+  privacyPolicy: "<h3>Chính sách bảo mật</h3><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...</p>",
+  termsOfService: "<h3>Điều khoản dịch vụ</h3><p>Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý với...</p>"
 };
 
 export const INITIAL_COURSES: Course[] = [

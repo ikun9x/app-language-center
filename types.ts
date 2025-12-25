@@ -85,6 +85,8 @@ export interface SiteConfig {
   statsTeachers?: string;
   statsCourses?: string;
   statsSatisfaction?: string;
+  privacyPolicy?: string;
+  termsOfService?: string;
 }
 
 export interface Testimonial {

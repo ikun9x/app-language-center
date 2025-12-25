@@ -62,7 +62,8 @@ const DataSchema = new mongoose.Schema({
     categories: Array,
     publicDocuments: Array,
     testimonials: Array,
-    blogPosts: Array
+    blogPosts: Array,
+    adminHash: String
 }, { timestamps: true });
 
 const DataModel = mongoose.model('Data', DataSchema);
@@ -171,8 +172,21 @@ app.post('/api/login', async (req, res) => {
 
     // For now, only one admin account
     const validUser = 'admin';
+    let currentHash = ADMIN_PASS_HASH;
 
-    if (username === validUser && await bcrypt.compare(password, ADMIN_PASS_HASH)) {
+    // Check MongoDB for custom hash
+    if (mongoose.connection.readyState === 1) {
+        try {
+            const dbData = await DataModel.findOne({ id: 'app_state' });
+            if (dbData?.adminHash) currentHash = dbData.adminHash;
+        } catch (e) { }
+    } else {
+        // Check local db.json for custom hash
+        const localData = readDB();
+        if (localData?.adminHash) currentHash = localData.adminHash;
+    }
+
+    if (username === validUser && await bcrypt.compare(password, currentHash)) {
         // Success: Clear attempts
         loginAttempts.delete(ip);
         const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
@@ -188,6 +202,51 @@ app.post('/api/login', async (req, res) => {
             ? 'Đã thử quá 5 lần. Tài khoản sẽ bị khóa trong 5 phút.'
             : 'Username hoặc mật khẩu không chính xác'
     });
+});
+
+app.post('/api/change-password', authenticate, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin' });
+    }
+
+    let currentHash = ADMIN_PASS_HASH;
+    let dbData = null;
+
+    if (mongoose.connection.readyState === 1) {
+        try {
+            dbData = await DataModel.findOne({ id: 'app_state' });
+            if (dbData?.adminHash) currentHash = dbData.adminHash;
+        } catch (e) { }
+    } else {
+        const localData = readDB();
+        if (localData?.adminHash) currentHash = localData.adminHash;
+    }
+
+    if (!(await bcrypt.compare(currentPassword, currentHash))) {
+        return res.status(400).json({ error: 'Mật khẩu hiện tại không chính xác' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    if (mongoose.connection.readyState === 1) {
+        try {
+            if (!dbData) {
+                await DataModel.create({ id: 'app_state', adminHash: newHash });
+            } else {
+                dbData.adminHash = newHash;
+                await dbData.save();
+            }
+        } catch (e) {
+            return res.status(500).json({ error: 'Lỗi lưu mật khẩu mới vào Database' });
+        }
+    } else {
+        const localData = readDB() || { id: 'app_state' };
+        localData.adminHash = newHash;
+        writeDB(localData);
+    }
+
+    res.json({ success: true, message: 'Đã đổi mật khẩu thành công' });
 });
 app.get('/api/data', async (req, res) => {
     // 1. Try MongoDB if connected

@@ -35,6 +35,8 @@ import {
   Trophy,
   Menu,
   Star,
+  Lock,
+  Shield,
   X
 } from 'lucide-react';
 const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -1231,7 +1233,7 @@ const SeoManager: React.FC = () => {
         <h4 className="font-bold mb-4 flex items-center gap-2"><Globe size={18} /> Xem trước hiển thị</h4>
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-2">
           <p className="text-blue-800 text-lg font-medium hover:underline cursor-pointer">{localSeo.title}</p>
-          <p className="text-green-700 text-sm">https://binhminh-tayninh.edu.vn</p>
+          <p className="text-green-700 text-sm">{typeof window !== 'undefined' ? window.location.origin : 'https://binhminh-tayninh.edu.vn'}</p>
           <p className="text-slate-600 text-sm line-clamp-2">{localSeo.description}</p>
         </div>
       </div>
@@ -2359,26 +2361,249 @@ const SystemOptimizer: React.FC = () => {
 };
 
 const ComplianceManager: React.FC = () => {
+  const { state, updateState, apiBaseUrl } = useApp();
+  const [showEditor, setShowEditor] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [editorType, setEditorType] = useState<'terms' | 'privacy'>('terms');
+  const [localContent, setLocalContent] = useState('');
+
+  const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+
+  const openEditor = (type: 'terms' | 'privacy') => {
+    setEditorType(type);
+    setLocalContent(type === 'terms' ? state.config.termsOfService || '' : state.config.privacyPolicy || '');
+    setShowEditor(true);
+  };
+
+  const handleSaveContent = () => {
+    updateState({
+      config: {
+        ...state.config,
+        [editorType === 'terms' ? 'termsOfService' : 'privacyPolicy']: localContent
+      }
+    });
+    setShowEditor(false);
+    toast.success('Cập nhật nội dung thành công!');
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwords.new !== passwords.confirm) {
+      toast.error('Mật khẩu mới không khớp!');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('bm_admin_token') || sessionStorage.getItem('bm_admin_token')}`
+        },
+        body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.new })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Đổi mật khẩu thành công!');
+        setShowPasswordModal(false);
+        setPasswords({ current: '', new: '', confirm: '' });
+      } else {
+        toast.error(data.error || 'Đổi mật khẩu thất bại');
+      }
+    } catch (err) {
+      toast.error('Không thể kết nối tới máy chủ');
+    }
+  };
+
   return (
-    <div className="max-w-3xl space-y-10">
+    <div className="max-w-4xl space-y-10 mb-20">
       <div>
         <h2 className="text-3xl font-extrabold text-slate-900">Bảo mật & Pháp lý</h2>
-        <p className="text-slate-500">Quản lý các điều khoản và chính sách bảo mật.</p>
+        <p className="text-slate-500">Quản lý các điều khoản, chính sách bảo mật và cài đặt an toàn hệ thống.</p>
       </div>
 
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-sm space-y-6">
-        <div className="p-6 bg-slate-50 rounded-2xl space-y-2">
-          <h4 className="font-bold text-slate-800">Cài đặt bảo mật</h4>
-          <p className="text-sm text-slate-500">Xác thực 2 lớp, quản lý phiên đăng nhập và các quyền truy cập hệ thống.</p>
-          <button className="text-blue-600 text-sm font-bold mt-2">Thiết lập ngay →</button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Security Settings Card */}
+        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between border border-slate-100 hover:shadow-md transition">
+          <div className="space-y-4">
+            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600">
+              <Lock size={28} />
+            </div>
+            <h4 className="font-black text-xl text-slate-900">Cài đặt bảo mật</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Xác thực 2 lớp (2FA), quản lý phiên đăng nhập và thay đổi mật khẩu quản trị viên định kỳ.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowPasswordModal(true)}
+            className="w-full mt-8 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition text-sm"
+          >
+            Đổi mật khẩu ngay →
+          </button>
         </div>
 
-        <div className="p-6 bg-slate-50 rounded-2xl space-y-2">
-          <h4 className="font-bold text-slate-800">Điều khoản dịch vụ</h4>
-          <p className="text-sm text-slate-500">Cập nhật nội dung hiển thị trong trang Chính sách của trung tâm.</p>
-          <button className="text-blue-600 text-sm font-bold mt-2">Cập nhật nội dung →</button>
+        {/* Data Privacy Card */}
+        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between border border-slate-100 hover:shadow-md transition">
+          <div className="space-y-4">
+            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+              <Shield size={28} />
+            </div>
+            <h4 className="font-black text-xl text-slate-900">Dữ liệu & Quyền riêng tư</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Tuân thủ các quy định về bảo vệ dữ liệu cá nhân (GDPR/ND73). Quản lý cách thông tin học viên được xử lý.
+            </p>
+          </div>
+          <button
+            onClick={() => openEditor('privacy')}
+            className="w-full mt-8 bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 transition text-sm"
+          >
+            Cập nhật Chính sách →
+          </button>
+        </div>
+
+        {/* Terms of Service Card */}
+        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between border border-slate-100 hover:shadow-md transition md:col-span-2">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-start gap-6">
+              <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0">
+                <FileText size={28} />
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-black text-xl text-slate-900">Điều khoản dịch vụ</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Cập nhật các quy tắc, quy định dành cho học viên và phụ huynh khi tham gia đào tạo tại trung tâm.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => openEditor('terms')}
+              className="md:w-auto w-full bg-slate-100 text-slate-900 font-bold px-8 py-4 rounded-2xl hover:bg-slate-200 transition text-sm shrink-0"
+            >
+              Chỉnh sửa Điều khoản →
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Content Editor Modal */}
+      {showEditor && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[3rem] shadow-2xl flex flex-col overflow-hidden">
+            <div className="p-8 border-b flex justify-between items-center bg-slate-50">
+              <div>
+                <h3 className="text-2xl font-black text-slate-900">
+                  {editorType === 'terms' ? 'Chỉnh sửa Điều khoản dịch vụ' : 'Chỉnh sửa Chính sách bảo mật'}
+                </h3>
+                <p className="text-sm text-slate-500 flex items-center gap-1">
+                  <Clock size={14} /> Tự động lưu bản nháp vào bộ nhớ tạm
+                </p>
+              </div>
+              <button
+                onClick={() => setShowEditor(false)}
+                className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8">
+              <div className="prose-editor min-h-[400px]">
+                <ReactQuill
+                  theme="snow"
+                  value={localContent}
+                  onChange={setLocalContent}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Bắt đầu nhập nội dung pháp lý tại đây..."
+                  className="h-[350px] mb-12"
+                />
+              </div>
+            </div>
+
+            <div className="p-8 border-t bg-slate-50 flex gap-4">
+              <button
+                onClick={() => setShowEditor(false)}
+                className="flex-1 py-4 text-slate-500 font-bold hover:bg-white rounded-2xl transition"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleSaveContent}
+                className="flex-[2] bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition flex items-center justify-center gap-2"
+              >
+                <Save size={20} /> Lưu & Xuất bản ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl flex flex-col overflow-hidden">
+            <div className="p-8 border-b flex justify-between items-center bg-slate-50">
+              <h3 className="text-2xl font-black text-slate-900">Đổi mật khẩu</h3>
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 transition shadow-sm"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handlePasswordChange} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Mật khẩu hiện tại</label>
+                <input
+                  type="password"
+                  required
+                  className="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  value={passwords.current}
+                  onChange={e => setPasswords({ ...passwords, current: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Mật khẩu mới</label>
+                <input
+                  type="password"
+                  required
+                  className="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  value={passwords.new}
+                  onChange={e => setPasswords({ ...passwords, new: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Xác nhận mật khẩu mới</label>
+                <input
+                  type="password"
+                  required
+                  className="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  value={passwords.confirm}
+                  onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
+                />
+              </div>
+
+              <div className="pt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-black shadow-xl shadow-slate-200 transition"
+                >
+                  Cập nhật
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
