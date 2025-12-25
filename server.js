@@ -48,7 +48,8 @@ const DataSchema = new mongoose.Schema({
     messages: Array,
     categories: Array,
     publicDocuments: Array,
-    testimonials: Array
+    testimonials: Array,
+    blogPosts: Array
 }, { timestamps: true });
 
 const DataModel = mongoose.model('Data', DataSchema);
