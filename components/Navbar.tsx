@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Trang Chủ', id: 'hero' },
     { name: 'Khóa Học', id: 'courses' },
-    { name: 'Giảng Viên', id: 'teachers' },
+    { name: 'Giáo Viên', id: 'teachers' },
     { name: 'Tin Tức', id: 'news' },
     {
       name: 'Công khai',
