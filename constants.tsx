@@ -140,7 +140,7 @@ export const INITIAL_COURSES: Course[] = [
 export const INITIAL_TEACHERS: Teacher[] = [
   {
     "name": "Mr. Đạt",
-    "role": "Giảng viên IELTS",
+    "role": "Giáo viên IELTS",
     "phone": "07080808011",
     "email": "datss@gmail.com",
     "gender": "male",
@@ -151,7 +151,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
   },
   {
     "name": "Ms. Trang",
-    "role": "Giảng viên B1",
+    "role": "Giáo viên B1",
     "phone": "076518899122",
     "email": "trangbb@gmail.com",
     "gender": "female",

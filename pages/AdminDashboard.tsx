@@ -143,7 +143,7 @@ const AdminDashboard: React.FC = () => {
           <SidebarLink to="/admin" icon={<LayoutDashboard size={20} />} label="Tổng quan" active={location.pathname === '/admin'} onClick={closeSidebar} />
           <SidebarLink to="/admin/content" icon={<Edit3 size={20} />} label="Quản trị giao diện" active={location.pathname === '/admin/content'} onClick={closeSidebar} />
           <SidebarLink to="/admin/courses" icon={<BookOpen size={20} />} label="Khóa học" active={location.pathname === '/admin/courses'} onClick={closeSidebar} />
-          <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giảng viên" active={location.pathname === '/admin/teachers'} onClick={closeSidebar} />
+          <SidebarLink to="/admin/teachers" icon={<UsersIcon size={20} />} label="Giáo viên" active={location.pathname === '/admin/teachers'} onClick={closeSidebar} />
           <SidebarLink to="/admin/achievements" icon={<Trophy size={20} />} label="Thành tích" active={location.pathname === '/admin/achievements'} onClick={closeSidebar} />
           <SidebarLink to="/admin/testimonials" icon={<MessageSquare size={20} />} label="Đánh giá khách hàng" active={location.pathname === '/admin/testimonials'} onClick={closeSidebar} />
           <SidebarLink to="/admin/documents" icon={<FileText size={20} />} label="Văn bản công khai" active={location.pathname === '/admin/documents'} onClick={closeSidebar} />
@@ -202,7 +202,7 @@ const Overview: React.FC<{ state: any }> = ({ state }) => (
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <StatCard label="Khóa học đang mở" value={state.courses.length} color="blue" icon={<BookOpen size={24} />} trend="+2 tháng này" />
-      <StatCard label="Đội ngũ giảng viên" value={state.teachers.length} color="indigo" icon={<UsersIcon size={24} />} trend="Ổn định" />
+      <StatCard label="Đội ngũ giáo viên" value={state.teachers.length} color="indigo" icon={<UsersIcon size={24} />} trend="Ổn định" />
       <StatCard label="Yêu cầu tư vấn mới" value={state.messages.length} color="orange" icon={<MessageSquare size={24} />} trend="Cần xử lý" />
       <StatCard label="Lượt truy cập" value="1,280" color="emerald" icon={<Globe size={24} />} trend="+15% tuần qua" />
     </div>
@@ -406,7 +406,7 @@ const ContentManager: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Giảng viên giỏi</label>
+            <label className="block text-[10px] font-black text-blue-200 uppercase tracking-widest">Giáo viên giỏi</label>
             <input
               className="w-full p-4 bg-white/10 hover:bg-white/20 focus:bg-white border-2 border-transparent focus:border-blue-300 rounded-2xl outline-none transition font-black text-xl text-white focus:text-blue-900"
               value={localConfig.statsTeachers || ''}
@@ -1258,7 +1258,7 @@ const TeachersManager: React.FC = () => {
   const [editingTeacher, setEditingTeacher] = useState<any>(null);
 
   const handleDelete = async (teacher: any) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa giảng viên này?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa giáo viên này?')) {
       await deletePhysicalFile(teacher.image);
       const newTeachers = state.teachers.filter(t => t.id !== teacher.id);
       updateState({ teachers: newTeachers });
@@ -1277,26 +1277,26 @@ const TeachersManager: React.FC = () => {
     updateState({ teachers: newTeachers });
     setShowModal(false);
     setEditingTeacher(null);
-    toast.success(editingTeacher ? 'Cập nhật thông tin giảng viên thành công!' : 'Đã thêm giảng viên mới!');
+    toast.success(editingTeacher ? 'Cập nhật thông tin giáo viên thành công!' : 'Đã thêm giáo viên mới!');
   };
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900tracking-tight">Quản lý giảng viên</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Quản lý giáo viên</h2>
           <p className="text-slate-500">Danh sách đội ngũ giáo viên của trung tâm.</p>
         </div>
         <button
           onClick={() => { setEditingTeacher(null); setShowModal(true); }}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition transform active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-2"
         >
-          <PlusCircle size={20} /> Thêm giảng viên
+          <PlusCircle size={20} /> Thêm giáo viên
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {state.teachers.map((t: any) => (
+        {[...state.teachers].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((t: any) => (
           <div key={t.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm group hover:shadow-xl hover:shadow-indigo-100/30 transition-all duration-300 space-y-6">
             <div className="relative">
               <div className="w-24 h-24 rounded-3xl bg-indigo-50 overflow-hidden border-4 border-white shadow-inner">
@@ -1311,10 +1311,15 @@ const TeachersManager: React.FC = () => {
                 )}
               </div>
               <div className="absolute -bottom-2 -right-2">
-                <span className={`px - 3 py - 1 text - [10px] font-black uppercase tracking - widest rounded - full shadow - lg text - white ${t.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'} `}>
+                <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg text-white ${t.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'}`}>
                   {t.gender === 'female' ? 'Nữ' : 'Nam'}
                 </span>
               </div>
+              {t.order !== undefined && (
+                <div className="absolute top-0 right-0">
+                  <span className="bg-slate-900/10 text-slate-500 text-[9px] font-black px-2 py-0.5 rounded-full">#{t.order}</span>
+                </div>
+              )}
             </div>
 
             <div className="space-y-1">
@@ -1356,8 +1361,8 @@ const TeachersManager: React.FC = () => {
               <UsersIcon size={40} />
             </div>
             <div>
-              <p className="text-slate-400 font-black text-xl">Chưa có giảng viên nào</p>
-              <p className="text-slate-400 text-sm">Hãy bắt đầu bằng cách thêm giảng viên đầu tiên.</p>
+              <p className="text-slate-400 font-black text-xl">Chưa có giáo viên nào</p>
+              <p className="text-slate-400 text-sm">Hãy bắt đầu bằng cách thêm giáo viên đầu tiên.</p>
             </div>
           </div>
         )}
@@ -1386,7 +1391,8 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
     image: '',
     zalo: '',
     showPhone: false,
-    showEmail: false
+    showEmail: false,
+    order: 0
   });
   const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload');
 
@@ -1445,7 +1451,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
       <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-300 border border-slate-100 flex flex-col max-h-[90vh]">
         <div className="p-10 border-b flex justify-between items-center bg-slate-50/50">
           <div>
-            <h3 className="text-3xl font-black text-slate-900 tracking-tight">{teacher ? 'Cập nhật giảng viên' : 'Thêm giảng viên mới'}</h3>
+            <h3 className="text-3xl font-black text-slate-900 tracking-tight">{teacher ? 'Cập nhật giáo viên' : 'Thêm giáo viên mới'}</h3>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Thông tin chi tiết đội ngũ</p>
           </div>
           <button onClick={onClose} className="p-3 hover:bg-slate-200 rounded-full transition"><X size={24} /></button>
@@ -1524,7 +1530,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                     className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
                     value={formData.role}
                     onChange={e => setFormData({ ...formData, role: e.target.value })}
-                    placeholder="Ví dụ: Giảng viên IELTS"
+                    placeholder="Ví dụ: Giáo viên IELTS"
                   />
                 </div>
                 <div className="space-y-2">
@@ -1567,6 +1573,16 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
                     placeholder="Ví dụ: hotro@binhminh.edu.vn"
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thứ tự hiển thị (Order)</label>
+                  <input
+                    type="number"
+                    className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none transition font-bold text-slate-700"
+                    value={formData.order ?? ''}
+                    onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    placeholder="Ví dụ: 1"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -1593,7 +1609,7 @@ const TeacherModal: React.FC<{ teacher: any, onClose: () => void, onSave: (data:
             onClick={handleSaveClick}
             className="px-16 py-4 bg-indigo-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition transform active:scale-95 flex items-center gap-3"
           >
-            <Save size={18} /> {teacher ? 'Cập nhật ngay' : 'Thêm giảng viên'}
+            <Save size={18} /> {teacher ? 'Cập nhật ngay' : 'Thêm giáo viên'}
           </button>
         </div>
       </div>

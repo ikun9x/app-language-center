@@ -21,6 +21,7 @@ export interface Teacher {
   zalo?: string;
   showPhone?: boolean;
   showEmail?: boolean;
+  order?: number;
 }
 
 export interface Achievement {

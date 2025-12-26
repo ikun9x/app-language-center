@@ -55,25 +55,27 @@
   "teachers": [
     {
       "name": "Mr. Đạt",
-      "role": "Giảng viên IELTS",
+      "role": "Giáo viên IELTS",
       "phone": "07080808011",
       "email": "datss@gmail.com",
       "gender": "male",
       "bio": "Kinh nghiệm 15 năm, vui vẻ, hài hước",
       "image": "",
       "zalo": "",
-      "id": "1766497027001"
+      "id": "1766497027001",
+      "order": 1
     },
     {
       "name": "Ms. Trang",
-      "role": "Giảng viên B1",
+      "role": "Giáo viên B1",
       "phone": "076518899122",
       "email": "trangbb@gmail.com",
       "gender": "female",
       "bio": "Nhiệt tình, tận tuỵ, ân cần với học viên",
       "image": "",
       "zalo": "",
-      "id": "1766497089769"
+      "id": "1766497089769",
+      "order": 2
     },
     {
       "name": "Mrs. Kim Phụng",
@@ -84,7 +86,8 @@
       "bio": "",
       "image": "",
       "zalo": "",
-      "id": "1766497175367"
+      "id": "1766497175367",
+      "order": 0
     },
     {
       "name": "Test Teacher",
@@ -95,7 +98,8 @@
       "bio": "Experienced English teacher with 10 years of experience.",
       "image": "",
       "zalo": "",
-      "id": "1766498248826"
+      "id": "1766498248826",
+      "order": 3
     }
   ],
   "achievements": [
