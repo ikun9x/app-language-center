@@ -44,6 +44,7 @@ const HomePage: React.FC = () => {
   const docsPerPage = 5;
   const [currentTestiPage, setCurrentTestiPage] = useState(0);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
   const testiItemsPerPage = 2;
   const testimonialsList = (state.testimonials && state.testimonials.length > 0 ? state.testimonials : INITIAL_TESTIMONIALS).sort((a, b) => (a.order || 0) - (b.order || 0));
   const testiTotalPages = Math.ceil(testimonialsList.length / testiItemsPerPage);
@@ -305,13 +306,25 @@ const HomePage: React.FC = () => {
         />
       )}
 
+      {/* Teacher Detail Modal */}
+      {selectedTeacher && (
+        <TeacherDetailModal
+          teacher={selectedTeacher}
+          onClose={() => setSelectedTeacher(null)}
+        />
+      )}
+
       {/* Teachers */}
       <section id="teachers" className="py-16 px-6 bg-slate-50/30">
         <div className="max-w-7xl mx-auto text-center space-y-16">
-          <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Đội Ngũ <span className="text-blue-600">Giảng Viên</span></h2>
+          <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Đội Ngũ <span className="text-blue-600">Giáo Viên</span></h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-            {state.teachers.map(t => (
-              <div key={t.id} className="group flex flex-col items-center">
+            {[...state.teachers].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map(t => (
+              <div
+                key={t.id}
+                className="group flex flex-col items-center cursor-pointer"
+                onClick={() => setSelectedTeacher(t)}
+              >
                 <div className="w-56 h-56 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl mb-8 transform group-hover:scale-105 group-hover:rotate-3 transition duration-500 bg-indigo-50">
                   <img
                     src={getAssetPath(t.image || (t.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'))}
@@ -319,42 +332,20 @@ const HomePage: React.FC = () => {
                     alt={t.name}
                   />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.name}</h3>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">{t.name}</h3>
                 <p className="text-blue-600 text-sm font-black mb-4 uppercase tracking-widest">{t.role}</p>
                 <div className="flex flex-col items-center gap-3 mb-6">
                   {t.showPhone && t.phone && (
-                    <div className="flex items-center gap-3 group/phone">
+                    <div className="flex items-center gap-3">
                       <div className="flex gap-1.5">
-                        <a
-                          href={`tel:${t.phone}`}
-                          title="Gọi điện"
-                          className="w-10 h-10 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm border border-orange-100"
-                        >
-                          <PhoneIcon size={18} />
-                        </a>
-                        <a
-                          href={`https://zalo.me/${t.zalo || t.phone}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-sm border border-blue-100"
-                          title="Chat Zalo"
-                        >
-                          <img src="/images/zalo.png" className="w-6 h-6 object-contain" alt="Zalo" />
-                        </a>
+                        <div className="w-8 h-8 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center border border-orange-100">
+                          <PhoneIcon size={14} />
+                        </div>
+                        <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+                          <img src="/images/zalo.png" className="w-5 h-5 object-contain" alt="Zalo" />
+                        </div>
                       </div>
-                      <span className="text-slate-700 text-lg font-bold tracking-tight">{t.phone}</span>
-                    </div>
-                  )}
-                  {t.showEmail && t.email && (
-                    <div className="flex items-center gap-3 group/email">
-                      <a
-                        href={`mailto:${t.email}`}
-                        title="Gửi Email"
-                        className="w-10 h-10 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-100"
-                      >
-                        <Mail size={18} />
-                      </a>
-                      <span className="text-slate-700 text-lg font-bold tracking-tight truncate max-w-[200px]">{t.email}</span>
+                      <span className="text-slate-700 text-sm font-bold tracking-tight">{t.phone}</span>
                     </div>
                   )}
                 </div>
@@ -903,5 +894,80 @@ const CourseDetailModal: React.FC<{ course: any, onClose: () => void }> = ({ cou
   );
 };
 
+const TeacherDetailModal: React.FC<{ teacher: any, onClose: () => void }> = ({ teacher, onClose }) => {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 overflow-hidden">
+      <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={onClose} />
+      <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-500 flex flex-col md:flex-row max-h-[90vh] border border-slate-100">
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 z-50 p-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-full transition shadow-lg border border-slate-200"
+        >
+          <X size={24} />
+        </button>
+
+        {/* Left Side: Large Avatar */}
+        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-indigo-50">
+          <img
+            src={getAssetPath(teacher.image || (teacher.gender === 'female' ? '/assets/3d/women.png' : '/assets/3d/men.png'))}
+            className="w-full h-full object-cover"
+            alt={teacher.name}
+          />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white md:hidden" />
+        </div>
+
+        {/* Right Side: Information */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto no-scrollbar flex flex-col justify-center">
+          <div className="space-y-6">
+            <div>
+              <span className="bg-blue-600 text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg inline-block mb-4">
+                {teacher.role}
+              </span>
+              <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">{teacher.name}</h2>
+            </div>
+
+            <div className="prose prose-slate prose-lg font-medium text-slate-600 italic">
+              "{teacher.bio || 'Đội ngũ giáo viên tận tâm, giàu kinh nghiệm của trung tâm.'}"
+            </div>
+
+            <div className="space-y-4 pt-6 border-t border-slate-100">
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thông tin liên hệ</div>
+              <div className="flex flex-wrap gap-4">
+                {teacher.phone && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <a
+                        href={`tel:${teacher.phone}`}
+                        className="flex items-center gap-3 bg-orange-50 text-orange-600 px-6 py-3 rounded-2xl font-black text-sm hover:bg-orange-600 hover:text-white transition shadow-sm border border-orange-100"
+                      >
+                        <PhoneIcon size={18} /> Gọi điện
+                      </a>
+                      <a
+                        href={`https://zalo.me/${teacher.zalo || teacher.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-black text-sm hover:bg-blue-600 hover:text-white transition shadow-sm border border-blue-100"
+                      >
+                        <img src="/images/zalo.png" className="w-5 h-5 object-contain" alt="Zalo" /> Zalo
+                      </a>
+                    </div>
+                  </div>
+                )}
+                {teacher.email && (
+                  <a
+                    href={`mailto:${teacher.email}`}
+                    className="flex items-center gap-3 bg-rose-50 text-rose-600 px-6 py-3 rounded-2xl font-black text-sm hover:bg-rose-600 hover:text-white transition shadow-sm border border-rose-100"
+                  >
+                    <Mail size={18} /> Gửi Email
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default HomePage;
